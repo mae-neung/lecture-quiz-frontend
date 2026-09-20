@@ -68,6 +68,10 @@ src/
 
 상태는 `waiting`(대기), `running`(진행 중), `completed`(완료), `failed`(실패) 네 가지입니다. 상태의 표시 문구와 색상은 `src/features/workflows/`에서 한곳에 관리합니다.
 
+## Agent 역할 문서
+
+Agent의 역할과 입력·출력·완료 기준은 [AGENTS.md](AGENTS.md)와 `agents/` 폴더의 Markdown 파일에서 관리합니다. 앱 데이터의 `agentId`와 Agent 문서의 `id`는 동일하게 유지합니다.
+
 ## 목업 데이터
 
 백엔드 연결 전에는 [mockWorkflows.js](src/features/workflows/data/mockWorkflows.js)의 Agent, Workflow, Step, Run, Log 목업 데이터를 사용합니다. 실제 API를 연결할 때는 화면 컴포넌트가 아니라 `services/`에 데이터 요청 코드를 추가하고, 동일한 데이터 형태를 반환하도록 바꾸는 것을 권장합니다.
