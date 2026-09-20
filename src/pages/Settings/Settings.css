@@ -1,6 +1,0 @@
-.agent-list { display: grid; gap: 12px; margin-top: 36px; }
-.agent-list__item { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); }
-.agent-list__item h2 { margin: 0; color: var(--color-text); font-size: 1rem; }
-.agent-list__item p { margin: 8px 0 0; color: var(--color-muted); font-size: 0.875rem; }
-.agent-list__meta { display: grid; justify-items: end; gap: 8px; color: var(--color-muted); font-size: 0.75rem; }
-@media (max-width: 600px) { .agent-list__item { align-items: start; flex-direction: column; } .agent-list__meta { justify-items: start; } }

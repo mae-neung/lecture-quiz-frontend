@@ -37,7 +37,9 @@ React와 Vite 기반의 화면·상태·상호작용을 구현한다.
 
 ## 넘김 규칙
 
-구현 완료 후 리뷰 에이전트에게 검토를 요청한다.
+`docs/orchestration/gates.md`의 Implementation Gate와 Verification Gate를 확인한다. 구현 완료 후 검증 결과와 함께 리뷰 에이전트에게 검토를 요청한다.
+
+결과는 `docs/orchestration/handoff-template.md` 형식으로 작성한다.
 
 ## 오류 처리
 

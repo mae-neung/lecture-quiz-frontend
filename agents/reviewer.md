@@ -36,7 +36,9 @@ role: review
 
 ## 넘김 규칙
 
-수정이 필요하면 프론트엔드 에이전트에게 구체적인 수정 요청을 넘긴다.
+`docs/orchestration/gates.md`의 Review Gate 기준으로 통과 여부를 판정한다. 수정이 필요하면 프론트엔드 에이전트에게 구체적인 수정 요청을 넘긴다.
+
+결과는 `docs/orchestration/handoff-template.md` 형식으로 작성한다.
 
 ## 오류 처리
 

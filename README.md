@@ -1,92 +1,108 @@
 # Frontend Template
 
-React와 Vite 기반의 재사용 가능한 프론트엔드 시작 템플릿입니다.
+React, Vite, React Router 기반의 재사용 가능한 프론트엔드 시작 템플릿입니다.
 
-이 프로젝트는 pnpm을 패키지 관리자로 사용합니다. 설치는 `pnpm install`로 진행합니다.
+이 저장소의 오케스트레이션은 웹 애플리케이션 기능이 아닙니다. Codex나 Claude 같은 AI Agent가 기획·설계·구현·검토 역할을 나눠 **실제 저장소 코드를 작업하기 위한 규칙**입니다.
 
 ## 시작하기
 
+Node.js 24 이상과 pnpm 10을 사용합니다.
+
 ```bash
+node --version
 pnpm install
 pnpm dev
 ```
 
-개발 서버 주소는 터미널에 표시됩니다. 일반적으로 `http://localhost:5173`입니다.
+개발 서버 주소는 일반적으로 `http://localhost:5173`입니다.
 
 ## 명령어
 
 | 명령어 | 용도 |
 | --- | --- |
 | `pnpm dev` | 개발 서버 실행 |
-| `pnpm build` | 배포용 파일 생성 |
-| `pnpm preview` | 배포용 빌드를 로컬에서 미리 보기 |
 | `pnpm lint` | 코드 품질 검사 |
+| `pnpm build` | 배포용 파일 생성 |
+| `pnpm preview` | 배포용 빌드 미리 보기 |
+
+## AI 오케스트레이션 사용법
+
+오케스트레이션을 사용하려면 AI에게 역할 분담을 명시해서 요청합니다.
+
+```text
+로그인 페이지 작업을 Planner, Designer, Frontend, Reviewer로 나눠서 오케스트레이션해줘.
+계획을 먼저 보여주고 승인받은 뒤 구현해줘.
+```
+
+그러면 지원되는 환경에서 다음 흐름으로 실제 작업을 진행합니다.
+
+```text
+Planner
+→ Plan Gate
+→ Designer (UI 작업일 때)
+→ Frontend Implementer
+→ lint/build Gate
+→ Reviewer
+→ 완료 또는 수정
+```
+
+작은 작업은 필요한 역할만 지정할 수 있습니다.
+
+```text
+이 버튼 오류를 Frontend와 Reviewer 역할로 나눠 수정해줘.
+```
+
+관련 문서:
+
+- [AGENTS.md](AGENTS.md): 전체 저장소의 공통 규칙
+- [CLAUDE.md](CLAUDE.md): Claude용 진입 안내
+- [오케스트레이션 사용법](docs/orchestration/README.md)
+- [Gate 기준](docs/orchestration/gates.md)
+- [Agent Handoff 형식](docs/orchestration/handoff-template.md)
+- `agents/`: 역할별 책임과 완료 기준
+
+AI 도구마다 자동으로 읽는 안내 파일은 다릅니다. Codex 계열은 `AGENTS.md`, Claude Code는 `CLAUDE.md`를 진입점으로 사용하도록 구성했습니다. 그 외 도구에서는 루트 `AGENTS.md`를 먼저 읽도록 요청하세요.
+
+## 기본 라우트
+
+| 주소 | 화면 |
+| --- | --- |
+| `/` | 템플릿 시작 화면 |
+| `/about` | 폴더 구조 안내 |
+| 그 외 | 404 화면 |
 
 ## 폴더 구조
 
 ```text
 src/
-├── components/  # 여러 화면에서 재사용하는 UI 컴포넌트 (Button 예시 포함)
-├── features/    # 로그인, 상품 목록처럼 기능별 코드 묶음
+├── components/  # 여러 화면에서 재사용하는 UI
+├── features/    # 기능 단위의 화면·상태·로직
 ├── hooks/       # 재사용하는 React Hook
-├── pages/       # 페이지 단위 화면
-├── router/      # URL과 페이지를 연결하는 React Router 설정
-├── layouts/     # 여러 페이지가 함께 쓰는 화면 뼈대
-├── services/    # API 호출 등 외부 시스템 통신
-├── utils/       # 날짜·문자열 처리 같은 순수 유틸리티
-├── App.jsx      # 현재 최상위 화면 컴포넌트
-└── main.jsx     # React 앱의 진입점
+├── layouts/     # 여러 페이지가 공유하는 화면 구조
+├── pages/       # URL에 연결되는 페이지
+├── router/      # React Router 설정
+├── services/    # API 등 외부 시스템 통신
+├── utils/       # React에 의존하지 않는 공통 함수
+├── App.jsx
+└── main.jsx
 ```
 
-빈 폴더의 `.gitkeep` 파일은 Git이 폴더 구조를 유지하도록 하기 위한 자리표시자입니다. 해당 폴더에 실제 파일을 추가하면 삭제해도 됩니다.
+빈 폴더의 `.gitkeep` 파일은 Git이 기본 구조를 유지하기 위한 자리표시자입니다. 실제 파일이 추가되면 삭제해도 됩니다.
 
-## 코드 작성 방식
+## 코드 작성 기준
 
-- `@/`는 `src/`를 가리키는 경로 별칭입니다. 예: `@/components/Button/Button`
-- 한 컴포넌트의 JSX와 CSS는 같은 폴더에 둡니다.
-- 공용 컴포넌트는 `components/`, 특정 기능에서만 쓰는 컴포넌트는 해당 `features/` 내부에 둡니다.
-
-## 현재 라우트
-
-| 주소 | 화면 |
-| --- | --- |
-| `/` | 대시보드 |
-| `/workflows` | 워크플로우 목록 |
-| `/workflows/new` | 새 워크플로우 생성 |
-| `/workflows/:workflowId` | 워크플로우 단계 상세 |
-| `/runs` | 실행 기록 |
-| `/settings` | 설정 |
-
-## 오케스트레이션 모델
-
-이 템플릿은 다음 세 단위를 구분합니다.
-
-| 단위 | 의미 | 예시 |
-| --- | --- | --- |
-| Workflow | 여러 단계가 이어진 하나의 작업 흐름 | 랜딩 페이지 제작 |
-| Step | Workflow 안의 개별 작업 | 요구사항 분석, 화면 구현 |
-| Run | Workflow를 한 번 실행한 이력 | `run-2026-09-20-003` |
-
-상태는 `waiting`(대기), `running`(진행 중), `completed`(완료), `failed`(실패) 네 가지입니다. 상태의 표시 문구와 색상은 `src/features/workflows/`에서 한곳에 관리합니다.
-
-## Agent 역할 문서
-
-Agent의 역할과 입력·출력·완료 기준은 [AGENTS.md](AGENTS.md)와 `agents/` 폴더의 Markdown 파일에서 관리합니다. 앱 데이터의 `agentId`와 Agent 문서의 `id`는 동일하게 유지합니다.
-
-## 목업 데이터
-
-백엔드 연결 전에는 [mockWorkflows.js](src/features/workflows/data/mockWorkflows.js)의 Agent, Workflow, Step, Run, Log 목업 데이터를 사용합니다. 실제 API를 연결할 때는 화면 컴포넌트가 아니라 `services/`에 데이터 요청 코드를 추가하고, 동일한 데이터 형태를 반환하도록 바꾸는 것을 권장합니다.
-
-현재 화면은 `WorkflowProvider`가 데이터를 공유하고 브라우저의 `localStorage`에 저장합니다. 그래서 다음 단계에서 상태를 변경하면 새로고침 뒤에도 결과가 유지됩니다.
-
-상세 화면의 실행 제어는 학습용 시뮬레이션입니다. 실행 시작, 단계 완료, 실패 처리는 `WorkflowProvider`의 행동 함수가 담당하며, 이후 실제 API 호출로 교체할 부분입니다.
+- `@/`는 `src/`를 가리키는 경로 별칭입니다.
+- 공용 UI는 `components/`, 기능 전용 코드는 `features/<feature>/`에 둡니다.
+- 페이지는 화면 조립에 집중하고 API 통신과 복잡한 로직은 분리합니다.
+- 패키지는 pnpm으로만 관리합니다.
+- 코드 변경 후 `pnpm lint`와 `pnpm build`를 확인합니다.
 
 ## 환경 변수
 
-프로젝트별 설정은 `.env.example`을 복사해 `.env`에 작성합니다. `.env`는 Git에 포함되지 않습니다.
+프로젝트별 설정은 `.env.example`을 복사해 `.env`에 작성합니다.
 
-```bash
+```powershell
 Copy-Item .env.example .env
 ```
 
-Vite에서 브라우저 코드로 읽을 값은 반드시 `VITE_`로 시작해야 합니다. 이 값은 사용자에게 노출될 수 있으므로 API 비밀번호나 비밀 키는 절대 넣지 않습니다.
+브라우저에서 읽는 환경 변수는 `VITE_`로 시작해야 합니다. API 비밀번호나 비밀 키는 프론트엔드 환경 변수에 넣지 않습니다.

@@ -36,7 +36,9 @@ role: planning
 
 ## 넘김 규칙
 
-화면 구조가 필요한 작업은 디자인 에이전트에게, 구현 작업은 프론트엔드 에이전트에게 넘긴다.
+`docs/orchestration/gates.md`의 Plan Gate를 자체 확인한다. 화면 구조가 필요한 작업은 디자인 에이전트에게, 구현 작업은 프론트엔드 에이전트에게 넘긴다.
+
+결과는 `docs/orchestration/handoff-template.md` 형식으로 작성한다.
 
 ## 오류 처리
 
