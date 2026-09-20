@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import './DashboardLayout.css'
 
 const navigationItems = [
@@ -12,10 +12,10 @@ function DashboardLayout() {
   return (
     <div className="dashboard-layout">
       <aside className="sidebar">
-        <a className="sidebar__brand" href="/">
+        <Link className="sidebar__brand" to="/">
           <span className="sidebar__brand-mark" aria-hidden="true">O</span>
           <span>Orchestra</span>
-        </a>
+        </Link>
 
         <nav className="sidebar__nav" aria-label="주요 메뉴">
           {navigationItems.map(({ to, label, end }) => (

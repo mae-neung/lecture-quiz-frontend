@@ -1,0 +1,5 @@
+.run-list { display: grid; gap: 12px; margin-top: 36px; }
+.run-list__item { display: grid; align-items: center; grid-template-columns: minmax(220px, 1fr) 130px 90px 72px; gap: 20px; padding: 18px 20px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); color: var(--color-muted); font-size: 0.875rem; }
+.run-list__item h2 { margin: 0; color: var(--color-text); font-size: 1rem; }
+.run-list__item p { margin: 6px 0 0; color: var(--color-muted); font-family: ui-monospace, Consolas, monospace; font-size: 0.75rem; }
+@media (max-width: 800px) { .run-list__item { grid-template-columns: 1fr auto; } }

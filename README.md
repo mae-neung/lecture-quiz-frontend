@@ -2,11 +2,13 @@
 
 React와 Vite 기반의 재사용 가능한 프론트엔드 시작 템플릿입니다.
 
+이 프로젝트는 pnpm을 패키지 관리자로 사용합니다. 설치는 `pnpm install`로 진행합니다.
+
 ## 시작하기
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 개발 서버 주소는 터미널에 표시됩니다. 일반적으로 `http://localhost:5173`입니다.
@@ -15,10 +17,10 @@ npm run dev
 
 | 명령어 | 용도 |
 | --- | --- |
-| `npm run dev` | 개발 서버 실행 |
-| `npm run build` | 배포용 파일 생성 |
-| `npm run preview` | 배포용 빌드를 로컬에서 미리 보기 |
-| `npm run lint` | 코드 품질 검사 |
+| `pnpm dev` | 개발 서버 실행 |
+| `pnpm build` | 배포용 파일 생성 |
+| `pnpm preview` | 배포용 빌드를 로컬에서 미리 보기 |
+| `pnpm lint` | 코드 품질 검사 |
 
 ## 폴더 구조
 
@@ -50,8 +52,29 @@ src/
 | --- | --- |
 | `/` | 대시보드 |
 | `/workflows` | 워크플로우 목록 |
+| `/workflows/:workflowId` | 워크플로우 단계 상세 |
 | `/runs` | 실행 기록 |
 | `/settings` | 설정 |
+
+## 오케스트레이션 모델
+
+이 템플릿은 다음 세 단위를 구분합니다.
+
+| 단위 | 의미 | 예시 |
+| --- | --- | --- |
+| Workflow | 여러 단계가 이어진 하나의 작업 흐름 | 랜딩 페이지 제작 |
+| Step | Workflow 안의 개별 작업 | 요구사항 분석, 화면 구현 |
+| Run | Workflow를 한 번 실행한 이력 | `run-2026-09-20-003` |
+
+상태는 `waiting`(대기), `running`(진행 중), `completed`(완료), `failed`(실패) 네 가지입니다. 상태의 표시 문구와 색상은 `src/features/workflows/`에서 한곳에 관리합니다.
+
+## 목업 데이터
+
+백엔드 연결 전에는 [mockWorkflows.js](src/features/workflows/data/mockWorkflows.js)의 Agent, Workflow, Step, Run, Log 목업 데이터를 사용합니다. 실제 API를 연결할 때는 화면 컴포넌트가 아니라 `services/`에 데이터 요청 코드를 추가하고, 동일한 데이터 형태를 반환하도록 바꾸는 것을 권장합니다.
+
+현재 화면은 `WorkflowProvider`가 데이터를 공유하고 브라우저의 `localStorage`에 저장합니다. 그래서 다음 단계에서 상태를 변경하면 새로고침 뒤에도 결과가 유지됩니다.
+
+상세 화면의 실행 제어는 학습용 시뮬레이션입니다. 실행 시작, 단계 완료, 실패 처리는 `WorkflowProvider`의 행동 함수가 담당하며, 이후 실제 API 호출로 교체할 부분입니다.
 
 ## 환경 변수
 
