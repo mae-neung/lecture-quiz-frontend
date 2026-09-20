@@ -8,7 +8,10 @@ function Workflows() {
   return (
     <section className="page">
       <p className="page__eyebrow">Workflows</p>
-      <h1 className="page__title">워크플로우</h1>
+      <div className="workflow-list__heading">
+        <h1 className="page__title">워크플로우</h1>
+        <Link className="workflow-list__create-link" to="/workflows/new">새 워크플로우</Link>
+      </div>
       <p className="page__description">작업 흐름을 만들고 단계별 진행 상태를 관리합니다.</p>
       <div className="workflow-list">
         {workflows.map((workflow) => {

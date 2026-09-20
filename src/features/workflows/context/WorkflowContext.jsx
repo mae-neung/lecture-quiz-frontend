@@ -41,6 +41,36 @@ export function WorkflowProvider({ children }) {
     window.localStorage.setItem(storageKey, JSON.stringify(state))
   }, [state])
 
+  const createWorkflow = ({ description, steps: draftSteps, title }) => {
+    const timestamp = Date.now()
+    const workflowId = `workflow-${timestamp}`
+    const steps = draftSteps.map((step, index) => ({
+      id: `step-${timestamp}-${index + 1}`,
+      order: index + 1,
+      title: step.title.trim(),
+      agentId: step.agentId,
+      status: 'waiting',
+      input: null,
+      output: null,
+      retryCount: 0,
+    }))
+
+    setState((currentState) => ({
+      ...currentState,
+      workflows: [{
+        id: workflowId,
+        title: title.trim(),
+        description: description.trim(),
+        status: 'waiting',
+        createdAt: new Date().toISOString(),
+        updatedAt: '방금 전',
+        steps,
+      }, ...currentState.workflows],
+    }))
+
+    return workflowId
+  }
+
   const startWorkflow = (workflowId) => {
     setState((currentState) => {
       const workflow = currentState.workflows.find((item) => item.id === workflowId)
@@ -142,8 +172,12 @@ export function WorkflowProvider({ children }) {
       if (!workflow || failedStepIndex === -1) return currentState
 
       const failedStep = workflow.steps[failedStepIndex]
+      const retryCount = failedStep.retryCount ?? 0
+
+      if (retryCount >= 2) return currentState
+
       const steps = workflow.steps.map((step, index) => (
-        index === failedStepIndex ? { ...step, status: 'running' } : step
+        index === failedStepIndex ? { ...step, status: 'running', retryCount: retryCount + 1 } : step
       ))
       const run = { id: `run-${Date.now()}`, workflowId, status: 'running', startedAt: '방금 전', completedAt: null, duration: '재시도 중' }
 
@@ -162,6 +196,7 @@ export function WorkflowProvider({ children }) {
   const value = {
     ...state,
     advanceWorkflow,
+    createWorkflow,
     failWorkflow,
     retryFailedStep,
     startWorkflow,

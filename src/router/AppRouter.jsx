@@ -5,6 +5,7 @@ import NotFound from '@/pages/NotFound/NotFound'
 import Runs from '@/pages/Runs/Runs'
 import Settings from '@/pages/Settings/Settings'
 import Workflows from '@/pages/Workflows/Workflows'
+import WorkflowCreate from '@/pages/WorkflowCreate/WorkflowCreate'
 import WorkflowDetail from '@/pages/WorkflowDetail/WorkflowDetail'
 
 function AppRouter() {
@@ -14,6 +15,7 @@ function AppRouter() {
         <Route element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="workflows" element={<Workflows />} />
+          <Route path="workflows/new" element={<WorkflowCreate />} />
           <Route path="workflows/:workflowId" element={<WorkflowDetail />} />
           <Route path="runs" element={<Runs />} />
           <Route path="settings" element={<Settings />} />

@@ -52,6 +52,7 @@ src/
 | --- | --- |
 | `/` | 대시보드 |
 | `/workflows` | 워크플로우 목록 |
+| `/workflows/new` | 새 워크플로우 생성 |
 | `/workflows/:workflowId` | 워크플로우 단계 상세 |
 | `/runs` | 실행 기록 |
 | `/settings` | 설정 |

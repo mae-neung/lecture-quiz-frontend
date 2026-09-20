@@ -20,6 +20,7 @@ function WorkflowDetail() {
   }
 
   const activeStep = workflow.steps.find((step) => step.status === 'running')
+  const failedStep = workflow.steps.find((step) => step.status === 'failed')
   const activeAgent = agents.find((agent) => agent.id === activeStep?.agentId)
   const workflowRunIds = new Set(runs.filter((run) => run.workflowId === workflow.id).map((run) => run.id))
   const workflowLogs = logs.filter((log) => workflowRunIds.has(log.runId))
@@ -59,7 +60,15 @@ function WorkflowDetail() {
             </>
           )}
           {workflow.status === 'completed' && <p className="workflow-detail__result">모든 단계가 완료됐습니다.</p>}
-          {workflow.status === 'failed' && <Button onClick={() => retryFailedStep(workflow.id)} variant="secondary">실패 단계 재시도</Button>}
+          {workflow.status === 'failed' && (
+            <Button
+              disabled={(failedStep?.retryCount ?? 0) >= 2}
+              onClick={() => retryFailedStep(workflow.id)}
+              variant="secondary"
+            >
+              {(failedStep?.retryCount ?? 0) >= 2 ? '재시도 한도 도달' : `실패 단계 재시도 (${failedStep?.retryCount ?? 0}/2)`}
+            </Button>
+          )}
         </div>
       </section>
       <section className="workflow-detail__steps" aria-labelledby="workflow-steps-title">
