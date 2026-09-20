@@ -10,6 +10,7 @@
   --color-text: #172033;
   --color-muted: #596579;
   --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
   --color-border: #dbe2ea;
   --color-surface: #ffffff;
   --color-code: #eef2ff;
@@ -27,6 +28,46 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+}
+
+.page {
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 48px;
+}
+
+.page__eyebrow {
+  margin: 0 0 8px;
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+.page__description {
+  margin: 12px 0 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.page__link {
+  display: inline-block;
+  margin-top: 24px;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 32px 20px;
+  }
 }
 
 button,
