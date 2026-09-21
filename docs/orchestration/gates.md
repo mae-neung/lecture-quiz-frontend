@@ -51,10 +51,11 @@ Frontend Agent가 자체 확인한다.
 ```bash
 pnpm lint
 pnpm test
+pnpm typecheck
 pnpm build
 ```
 
-관련 테스트를 추가하거나 갱신한다. 실패한 명령이 있으면 Review Gate로 넘어가지 않는다. 재시도는 `AGENTS.md`의 최대 2회 규칙을 따른다.
+`pnpm build`는 TypeScript 타입 검사 후 Vite 빌드를 실행한다. 관련 테스트를 추가하거나 갱신한다. 실패한 명령이 있으면 Review Gate로 넘어가지 않는다. 재시도는 `AGENTS.md`의 최대 2회 규칙을 따른다.
 
 ## 6. Review Gate
 

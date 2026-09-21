@@ -5,6 +5,7 @@
 ## 프로젝트 기반
 
 - React 19
+- TypeScript 5
 - Vite 8
 - React Router
 - pnpm 10
@@ -107,6 +108,8 @@ Agent가 다음 Agent에게 결과를 넘길 때 `docs/orchestration/handoff-tem
 - React에 의존하지 않는 함수는 `src/utils/`에 둔다.
 - 상태 객체와 배열을 직접 변경하지 않는다.
 - 기존 경로 별칭 `@/`와 현재 파일 구조를 우선 사용한다.
+- 신규 애플리케이션 코드와 테스트는 `.ts` 또는 `.tsx`로 작성한다.
+- `any`로 타입 오류를 우회하지 않고 명시적 타입이나 `unknown` narrowing을 우선한다.
 - 신규 공용 UI와 스타일은 DEVUP UI와 `devup.json`의 토큰을 우선 사용한다.
 - reset, 문서 레이아웃, 기존 화면의 점진 이전에는 일반 CSS를 사용할 수 있다.
 - 요청하지 않은 라이브러리를 임의로 추가하지 않는다.
@@ -119,6 +122,7 @@ Agent가 다음 Agent에게 결과를 넘길 때 `docs/orchestration/handoff-tem
 ```bash
 pnpm lint
 pnpm test
+pnpm typecheck
 pnpm build
 ```
 

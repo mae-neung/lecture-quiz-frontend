@@ -1,6 +1,6 @@
 # Frontend Template
 
-React, Vite, React Router 기반의 재사용 가능한 프론트엔드 시작 템플릿입니다.
+React, TypeScript, Vite, React Router 기반의 재사용 가능한 프론트엔드 시작 템플릿입니다.
 
 이 저장소의 오케스트레이션은 웹 애플리케이션 기능이 아닙니다. Codex나 Claude 같은 AI Agent가 기획·설계·구현·검토 역할을 나눠 **실제 저장소 코드를 작업하기 위한 규칙**입니다.
 
@@ -24,7 +24,8 @@ pnpm dev
 | `pnpm lint` | 코드 품질 검사 |
 | `pnpm test` | 회귀 테스트 단발 실행 |
 | `pnpm test:watch` | 변경을 감시하며 테스트 실행 |
-| `pnpm build` | 배포용 파일 생성 |
+| `pnpm typecheck` | strict TypeScript 타입 검사 |
+| `pnpm build` | 타입 검사 후 배포용 파일 생성 |
 | `pnpm preview` | 배포용 빌드 미리 보기 |
 
 ## AI 오케스트레이션 사용법
@@ -86,8 +87,8 @@ src/
 ├── router/      # React Router 설정
 ├── services/    # API 등 외부 시스템 통신
 ├── utils/       # React에 의존하지 않는 공통 함수
-├── App.jsx
-└── main.jsx
+├── App.tsx
+└── main.tsx
 ```
 
 빈 폴더의 `.gitkeep` 파일은 Git이 기본 구조를 유지하기 위한 자리표시자입니다. 실제 파일이 추가되면 삭제해도 됩니다.
@@ -97,13 +98,15 @@ src/
 - `@/`는 `src/`를 가리키는 경로 별칭입니다.
 - 공용 UI는 `components/`, 기능 전용 코드는 `features/<feature>/`에 둡니다.
 - 신규 공용 UI는 DEVUP UI와 루트 `devup.json`의 디자인 토큰을 우선 사용합니다.
+- 신규 애플리케이션 코드와 테스트는 `.ts` 또는 `.tsx`로 작성합니다.
+- `any`로 타입 오류를 우회하지 않고 명시적 타입이나 `unknown` narrowing을 우선합니다.
 - 페이지는 화면 조립에 집중하고 API 통신과 복잡한 로직은 분리합니다.
 - 패키지는 pnpm으로만 관리합니다.
-- 코드 변경 후 `pnpm lint`, `pnpm test`, `pnpm build`를 순서대로 확인합니다.
+- 코드 변경 후 `pnpm lint`, `pnpm test`, `pnpm typecheck`, `pnpm build`를 순서대로 확인합니다.
 
 ## 지속적 통합
 
-GitHub Actions는 pull request와 `dev`, `prod` 브랜치 push에서 의존성을 frozen lockfile로 설치한 뒤 lint, test, build를 실행합니다.
+GitHub Actions는 pull request와 `dev`, `prod` 브랜치 push에서 의존성을 frozen lockfile로 설치한 뒤 lint, test, type check/build를 실행합니다.
 
 ## 환경 변수
 

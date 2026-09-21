@@ -1,6 +1,11 @@
 import { Button as DevupButton } from '@devup-ui/react'
+import type { ComponentProps } from 'react'
 
-function Button({ children, className = '', type = 'button', variant = 'primary', ...props }) {
+export type ButtonProps = Omit<ComponentProps<typeof DevupButton>, 'variant'> & {
+  variant?: 'primary' | 'secondary' | 'danger'
+}
+
+function Button({ children, className = '', type = 'button', variant = 'primary', ...props }: ButtonProps) {
   const isDanger = variant === 'danger'
   const isSecondary = variant === 'secondary'
 

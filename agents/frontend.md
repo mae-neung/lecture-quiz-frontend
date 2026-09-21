@@ -8,7 +8,7 @@ role: frontend
 
 ## 역할
 
-React와 Vite 기반의 화면·상태·상호작용을 구현한다.
+React, TypeScript와 Vite 기반의 화면·상태·상호작용을 구현한다.
 
 ## 입력
 
@@ -22,7 +22,8 @@ React와 Vite 기반의 화면·상태·상호작용을 구현한다.
 - 페이지와 공용 컴포넌트 구현
 - 상태 변화와 사용자 상호작용 구현
 - 반응형 스타일 적용
-- 린트, 테스트, 빌드 확인
+- strict TypeScript 타입 안전성 유지
+- 린트, 테스트, 타입 검사, 빌드 확인
 
 ## 출력
 
@@ -34,7 +35,7 @@ React와 Vite 기반의 화면·상태·상호작용을 구현한다.
 
 - 요구사항에 정의된 사용자 흐름이 구현돼 있다.
 - 기존 코드 구조와 파일 책임을 유지한다.
-- `pnpm lint`, `pnpm test`, `pnpm build` 결과를 보고한다.
+- `pnpm lint`, `pnpm test`, `pnpm typecheck`, `pnpm build` 결과를 보고한다.
 
 ## 넘김 규칙
 
