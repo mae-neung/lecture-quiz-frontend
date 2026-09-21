@@ -15,6 +15,7 @@ role: planning
 - 사용자 요청
 - 기존 프로젝트 구조
 - 관련 요구사항과 제약
+- `docs/orchestration/model-routing.md`의 작업 강도 기준
 
 ## 수행 작업
 

@@ -8,6 +8,10 @@
 - From: <현재 역할>
 - To: <다음 역할>
 - Status: ready | needs-decision | failed
+- Workload tier: light | standard-analysis | standard-implementation | high
+- Model: <실제 사용 모델>
+- Reasoning effort: low | medium | high | xhigh | max | ultra
+- Routing note: <선택·승격·fallback 근거>
 
 ### 목표
 

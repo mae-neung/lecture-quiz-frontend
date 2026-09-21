@@ -51,6 +51,8 @@ Coordinator는 역할 문서의 내용을 직접 실행하는 척하지 않는�
 
 Agent 사이의 결과 전달은 `handoff-template.md`, Gate 판정은 `gates.md`를 사용한다.
 
+작업 강도별 모델과 reasoning effort 선택은 [Model Routing](model-routing.md)을 따른다. Codex 역할별 기본 설정은 `.codex/agents/`에서 관리한다.
+
 ## 현재 지원 범위
 
 - 프론트엔드 요구사항 분석

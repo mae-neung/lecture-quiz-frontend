@@ -6,7 +6,7 @@ React, Vite, React Router 기반의 재사용 가능한 프론트엔드 시작 �
 
 ## 시작하기
 
-Node.js 24 이상과 pnpm 10을 사용합니다.
+Node.js 24.15.0 이상과 pnpm 10을 사용합니다.
 
 ```bash
 node --version
@@ -22,6 +22,8 @@ pnpm dev
 | --- | --- |
 | `pnpm dev` | 개발 서버 실행 |
 | `pnpm lint` | 코드 품질 검사 |
+| `pnpm test` | 회귀 테스트 단발 실행 |
+| `pnpm test:watch` | 변경을 감시하며 테스트 실행 |
 | `pnpm build` | 배포용 파일 생성 |
 | `pnpm preview` | 배포용 빌드 미리 보기 |
 
@@ -41,7 +43,7 @@ Planner
 → Plan Gate
 → Designer (UI 작업일 때)
 → Frontend Implementer
-→ lint/build Gate
+→ lint/test/build Gate
 → Reviewer
 → 완료 또는 수정
 ```
@@ -59,6 +61,7 @@ Planner
 - [오케스트레이션 사용법](docs/orchestration/README.md)
 - [Gate 기준](docs/orchestration/gates.md)
 - [Agent Handoff 형식](docs/orchestration/handoff-template.md)
+- [모델 라우팅 기준](docs/orchestration/model-routing.md)
 - `agents/`: 역할별 책임과 완료 기준
 
 AI 도구마다 자동으로 읽는 안내 파일은 다릅니다. Codex 계열은 `AGENTS.md`, Claude Code는 `CLAUDE.md`를 진입점으로 사용하도록 구성했습니다. 그 외 도구에서는 루트 `AGENTS.md`를 먼저 읽도록 요청하세요.
@@ -93,9 +96,14 @@ src/
 
 - `@/`는 `src/`를 가리키는 경로 별칭입니다.
 - 공용 UI는 `components/`, 기능 전용 코드는 `features/<feature>/`에 둡니다.
+- 신규 공용 UI는 DEVUP UI와 루트 `devup.json`의 디자인 토큰을 우선 사용합니다.
 - 페이지는 화면 조립에 집중하고 API 통신과 복잡한 로직은 분리합니다.
 - 패키지는 pnpm으로만 관리합니다.
-- 코드 변경 후 `pnpm lint`와 `pnpm build`를 확인합니다.
+- 코드 변경 후 `pnpm lint`, `pnpm test`, `pnpm build`를 순서대로 확인합니다.
+
+## 지속적 통합
+
+GitHub Actions는 pull request와 `dev`, `prod` 브랜치 push에서 의존성을 frozen lockfile로 설치한 뒤 lint, test, build를 실행합니다.
 
 ## 환경 변수
 

@@ -8,8 +8,9 @@
 - Vite 8
 - React Router
 - pnpm 10
-- Node.js 24 이상
+- Node.js 24.15.0 이상
 - Oxlint
+- DEVUP UI
 
 패키지 명령은 pnpm만 사용한다. npm 또는 yarn 잠금 파일을 만들지 않는다.
 
@@ -55,7 +56,7 @@ Designer 작업 (필요한 경우)
   ↓
 Frontend Implementer 작업
   ↓
-[Verification Gate: lint/build/test]
+[Verification Gate: lint/test/build]
   ↓
 Reviewer 작업
   ├─ 수정 필요 → Frontend Implementer에게 반환
@@ -63,6 +64,14 @@ Reviewer 작업
 ```
 
 세부 Gate 기준은 `docs/orchestration/gates.md`를 따른다.
+
+## 모델 라우팅
+
+- 역할과 작업 강도를 분리하고 `docs/orchestration/model-routing.md`의 기준을 따른다.
+- Coordinator는 Agent 실행 전에 작업 강도를 판정하고 실제 모델과 reasoning effort를 선택한다.
+- 역할별 Codex 기본 설정은 `.codex/agents/*.toml`을 단일 원본으로 사용한다.
+- 반복 실패, 중대한 Reviewer 지적, 아키텍처·보안 위험이 있으면 한 단계 높은 강도로 승격한다.
+- 실제 선택과 승격·fallback 이유는 Handoff에 기록한다.
 
 ## 사용자 상호작용
 
@@ -98,6 +107,8 @@ Agent가 다음 Agent에게 결과를 넘길 때 `docs/orchestration/handoff-tem
 - React에 의존하지 않는 함수는 `src/utils/`에 둔다.
 - 상태 객체와 배열을 직접 변경하지 않는다.
 - 기존 경로 별칭 `@/`와 현재 파일 구조를 우선 사용한다.
+- 신규 공용 UI와 스타일은 DEVUP UI와 `devup.json`의 토큰을 우선 사용한다.
+- reset, 문서 레이아웃, 기존 화면의 점진 이전에는 일반 CSS를 사용할 수 있다.
 - 요청하지 않은 라이브러리를 임의로 추가하지 않는다.
 - 비밀 키나 인증 정보는 브라우저 코드와 Agent 문서에 기록하지 않는다.
 
@@ -107,10 +118,11 @@ Agent가 다음 Agent에게 결과를 넘길 때 `docs/orchestration/handoff-tem
 
 ```bash
 pnpm lint
+pnpm test
 pnpm build
 ```
 
-테스트가 구성된 기능을 변경했다면 해당 테스트도 실행한다. 검증하지 못한 항목은 성공으로 보고하지 않고 이유를 남긴다.
+관련 테스트를 추가하거나 갱신하고 위 명령을 순서대로 실행한다. 검증하지 못한 항목은 성공으로 보고하지 않고 이유를 남긴다.
 
 ## 오류 처리와 재시도
 

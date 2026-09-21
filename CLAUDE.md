@@ -8,4 +8,4 @@
 - `docs/orchestration/gates.md`
 - 해당 역할의 `agents/*.md`
 
-역할별 결과는 `docs/orchestration/handoff-template.md` 형식으로 다음 역할에 전달한다. 모델 이름이나 모델 설정을 저장소 파일에 추가하지 않는다.
+역할별 결과는 `docs/orchestration/handoff-template.md` 형식으로 다음 역할에 전달한다. 공개된 모델 라우팅 정책은 `docs/orchestration/model-routing.md`를 단일 원본으로 사용하며, 비밀 키나 계정별 모델 설정은 저장소에 기록하지 않는다.
