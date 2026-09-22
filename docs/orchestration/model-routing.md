@@ -30,7 +30,7 @@ Planner의 표준 기본값은 계획 수립을 위해 `gpt-5.6-sol` / `high`이
 | 고강도 구현 | `frontend_high` | workspace-write |
 | 코드 변경 후 리뷰 및 중요 리뷰 | `reviewer` | read-only |
 
-역할별 실행 설정의 단일 원본은 `.codex/agents/*.toml`이다. 탐색처럼 표에 없는 표준 읽기 작업은 내장 `explorer`에 `gpt-5.6-terra` / `medium`을 명시한다. 역할을 알 수 없는 임의 Agent를 기본값만 믿고 시작하지 않는다. Agent 도구가 없으면 같은 판정·계획·검증·리뷰 단계를 순차 수행하고 실제 모델 전환이 없었다고 기록한다.
+역할별 실행 설정의 단일 원본은 `.codex/agents/*.toml`이다. 탐색처럼 표에 없는 표준 읽기 작업은 내장 `explorer`에 `gpt-5.6-terra` / `medium`을 명시한다. 역할을 알 수 없는 임의 Agent를 기본값만 믿고 시작하지 않는다. 사용자가 Agent 분할을 요청하지 않은 경량 작업은 Coordinator가 단독 수행하며, 실행 중인 모델이 경량 모델로 바뀌었다고 보고하지 않는다. 코드 변경 시에는 Review Gate를 자체 점검하고 독립 검토가 아님을 기록한다. Agent 도구가 없으면 같은 판정·계획·검증·리뷰 단계를 순차 수행하고 실제 모델 전환이 없었다고 기록한다.
 
 Codex Custom Agent TOML에 설정된 `model`과 `model_reasoning_effort`가 생성 요청의 override보다 우선한다. 따라서 기존 profile에 다른 모델을 넘겨 강도를 바꾸려 하지 말고, 위 profile 자체를 선택한다. 일반 Agent에 명시 모델을 사용하는 예외가 필요하면 역할 지침·권한·선택 근거를 Handoff에 적고, 읽기 전용 역할에 쓰기 권한을 주지 않는다.
 
@@ -45,6 +45,7 @@ Codex Custom Agent TOML에 설정된 `model`과 `model_reasoning_effort`가 생�
 ## 4. Fallback과 기록
 
 - 지정 모델·profile을 사용할 수 없으면 같은 강도의 사용 가능한 대안을 확인한다. 없으면 한 단계 높은 모델을 명시적으로 선택한다. 고강도 모델도 사용할 수 없다면 낮은 모델로 조용히 대체하지 않고 `needs-decision`으로 중단한다.
+- 역할 분담을 요청했지만 경량 custom profile이 실행 환경에 노출되지 않으면, 일반 Agent에 해당 경량 모델·reasoning effort와 읽기/쓰기 범위를 명시해 시작할 수 있는지 확인한다. 가능할 때만 이를 대체 경로로 사용하고, 실제 설정을 확인하지 못하면 경량 모델이 적용됐다고 보고하지 않는다.
 - 실행 환경에 따라 모델 가용성이 달라질 수 있다. 가용성을 확인하지 못했으면 예상 모델을 실제 사용 모델로 보고하지 않는다.
 - Handoff에는 최초 강도, 최종 강도, 선택한 profile, 실제 모델·reasoning effort, 판정·승격·fallback 근거를 남긴다. 비밀 키나 계정별 설정은 저장소에 기록하지 않는다.
 

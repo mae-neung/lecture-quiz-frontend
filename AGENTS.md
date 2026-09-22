@@ -38,11 +38,11 @@
 | 1 | Planner | `agents/planner.md` | 표준 경로에서 항상; 경량 경로에서는 생략 가능 |
 | 2 | Designer | `agents/designer.md` | UI·사용자 흐름 변경이 있을 때 |
 | 3 | Frontend Implementer | `agents/frontend.md` | 코드 변경이 있을 때 |
-| 4 | Reviewer | `agents/reviewer.md` | 코드 변경 후 항상 |
+| 4 | Reviewer | `agents/reviewer.md` | 역할 분담 작업에서 코드 변경 후 항상; 단독 작업은 Review Gate 자체 점검 |
 
 선행 결과가 필요한 역할은 병렬로 실행하지 않는다. 서로 독립적인 조사나 파일 검사는 병렬로 진행할 수 있다.
 
-명확하고 되돌리기 쉬운 단일 파일 수정이나 문서 수정은 경량 경로를 사용할 수 있다. 이때 Coordinator가 목표·범위·검증 방법을 짧게 기록하고 Planner와 Designer를 생략한다. 의존성, 공용 API, UI 흐름, 빌드 설정, 보안·배포에 영향이 있거나 요구사항이 불명확하면 표준 경로를 사용한다. 사용자가 특정 역할이나 계획 승인을 요청했다면 경량 경로로 생략하지 않는다. 코드 변경 후 Reviewer 검토는 유지한다.
+명확하고 되돌리기 쉬운 단일 파일 수정이나 문서 수정은 경량 경로를 사용할 수 있다. 이때 Coordinator가 목표·범위·검증 방법을 짧게 기록하고 Planner와 Designer를 생략한다. 의존성, 공용 API, UI 흐름, 빌드 설정, 보안·배포에 영향이 있거나 요구사항이 불명확하면 표준 경로를 사용한다. 사용자가 특정 역할이나 계획 승인을 요청했다면 경량 경로로 생략하지 않는다. 코드 변경 후 Review Gate는 항상 수행한다. 단일 Agent 작업에서는 자체 점검으로 기록하고 독립 Reviewer 검토로 보고하지 않는다. 역할 분담을 요청한 작업에서는 Reviewer Agent에게 검토를 위임한다.
 
 ## 표준 실행 흐름
 
