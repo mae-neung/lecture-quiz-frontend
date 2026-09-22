@@ -38,11 +38,11 @@
 | 1 | Planner | `agents/planner.md` | 표준 경로에서 항상; 경량 경로에서는 생략 가능 |
 | 2 | Designer | `agents/designer.md` | UI·사용자 흐름 변경이 있을 때 |
 | 3 | Frontend Implementer | `agents/frontend.md` | 코드 변경이 있을 때 |
-| 4 | Reviewer | `agents/reviewer.md` | 코드 변경 후 항상 |
+| 4 | Reviewer | `agents/reviewer.md` | 역할 분담 작업에서 코드 변경 후 항상; 단독 작업은 Review Gate 자체 점검 |
 
 선행 결과가 필요한 역할은 병렬로 실행하지 않는다. 서로 독립적인 조사나 파일 검사는 병렬로 진행할 수 있다.
 
-명확하고 되돌리기 쉬운 단일 파일 수정이나 문서 수정은 경량 경로를 사용할 수 있다. 이때 Coordinator가 목표·범위·검증 방법을 짧게 기록하고 Planner와 Designer를 생략한다. 의존성, 공용 API, UI 흐름, 빌드 설정, 보안·배포에 영향이 있거나 요구사항이 불명확하면 표준 경로를 사용한다. 사용자가 특정 역할이나 계획 승인을 요청했다면 경량 경로로 생략하지 않는다. 코드 변경 후 Reviewer 검토는 유지한다.
+명확하고 되돌리기 쉬운 단일 파일 수정이나 문서 수정은 경량 경로를 사용할 수 있다. 이때 Coordinator가 목표·범위·검증 방법을 짧게 기록하고 Planner와 Designer를 생략한다. 의존성, 공용 API, UI 흐름, 빌드 설정, 보안·배포에 영향이 있거나 요구사항이 불명확하면 표준 경로를 사용한다. 사용자가 특정 역할이나 계획 승인을 요청했다면 경량 경로로 생략하지 않는다. 코드 변경 후 Review Gate는 항상 수행한다. 단일 Agent 작업에서는 자체 점검으로 기록하고 독립 Reviewer 검토로 보고하지 않는다. 역할 분담을 요청한 작업에서는 Reviewer Agent에게 검토를 위임한다.
 
 ## 표준 실행 흐름
 
@@ -71,10 +71,11 @@ Reviewer 작업
 ## 모델 라우팅
 
 - 역할과 작업 강도를 분리하고 `docs/orchestration/model-routing.md`의 기준을 따른다.
-- Coordinator는 Agent 실행 전에 작업 강도를 판정하고 실제 모델과 reasoning effort를 선택한다.
-- 역할별 Codex 기본 설정은 `.codex/agents/*.toml`을 단일 원본으로 사용한다.
-- 반복 실패, 중대한 Reviewer 지적, 아키텍처·보안 위험이 있으면 한 단계 높은 강도로 승격한다.
-- 실제 선택과 승격·fallback 이유는 Handoff에 기록한다.
+- Coordinator는 Agent 실행 전에 위험도가 가장 높은 조건을 기준으로 강도를 판정하고 역할·강도에 맞는 profile을 선택한다.
+- 역할별 Codex 실행 설정은 `.codex/agents/*.toml`을 단일 원본으로 사용한다. 기존 profile의 모델을 생성 요청의 override로 바꾸려 하지 않는다.
+- Agent 시작 후 실제 profile·모델·reasoning effort가 예상과 일치하는지 확인한다. 확인되지 않은 예상값을 실제 사용값으로 보고하지 않는다.
+- 범위 확장, 같은 원인의 재실패, 중대한 Reviewer 지적이 생기면 다음 시도 전에 재판정한다. 인증·보안·데이터 손실·배포 위험은 즉시 고강도로 판정한다.
+- 최초·최종 강도, 선택 profile, 실제 설정, 승격·fallback 이유를 Handoff에 기록한다. 고강도 모델이 없으면 낮은 모델로 조용히 대체하지 않는다.
 
 ## 사용자 상호작용
 
