@@ -55,7 +55,9 @@ Agent 사이의 결과 전달은 `handoff-template.md`, Gate 판정은 `gates.md
 
 UI·사용자 흐름을 바꾼 작업은 [UI 수동 점검표](ui-smoke-checklist.md)로 주요 라우트, 모바일 폭, 키보드 조작을 확인한다. 자동 E2E 도구는 기능이 늘어 필요해질 때 도입한다.
 
-작업 강도별 모델과 reasoning effort 선택은 [Model Routing](model-routing.md)을 따른다. Codex 역할별 기본 설정은 `.codex/agents/`에서 관리한다.
+작업 강도 판정과 실제 Agent profile 선택은 [Model Routing](model-routing.md)을 따른다. Coordinator가 Agent 시작 전 `역할 → 강도 → profile`을 고르고, 시작 후 실제 모델·reasoning effort를 확인한다. Codex 실행 설정은 `.codex/agents/`에서 관리한다. 단일 Agent 작업은 강도만 판정하며, 라우팅 문서가 실행 중인 모델을 자동 변경하지는 않는다.
+
+예를 들어 한 문서의 명확한 수정은 `light_frontend`, 일반 React 구현은 `frontend`, 보안 위험이 있는 구현은 `frontend_high`가 담당한다. 코드 변경 후에는 강도와 관계없이 `reviewer`가 검토한다. 작업 중 범위나 위험이 커지면 다음 Agent 실행 전에 강도를 다시 판정한다.
 
 ## 현재 지원 범위
 

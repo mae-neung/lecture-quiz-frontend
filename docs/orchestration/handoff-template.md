@@ -8,10 +8,11 @@
 - From: <현재 역할>
 - To: <다음 역할>
 - Status: ready | needs-decision | failed
-- Workload tier: light | standard-analysis | standard-implementation | high
-- Model: <실제 사용 모델>
-- Reasoning effort: low | medium | high | xhigh | max | ultra
-- Routing note: <선택·승격·fallback 근거>
+- Role / profile: <역할 / 실제 시작한 Agent profile; Agent 미사용 시 none>
+- Workload tier: <최초 강도 → 최종 강도; light-read | light-edit | standard-analysis | standard-implementation | high>
+- Model: <시작 후 확인한 실제 모델; 미확인 시 unverified>
+- Reasoning effort: <시작 후 확인한 값; 미확인 시 unverified>
+- Routing note: <판정 조건, 승격 시점·원인, fallback 또는 Agent 미사용 근거>
 - Branch / HEAD: <브랜치와 커밋 SHA; 코드 변경 전이면 기준 SHA>
 - Worktree / owner: <clean 또는 dirty와 변경 파일·담당 Agent>
 
@@ -54,3 +55,4 @@
 Handoff에는 비밀 키, 비밀번호, 인증 토큰, 불필요한 개인정보를 포함하지 않는다.
 코드 변경이 없으면 변경 파일과 검증 항목에 `해당 없음`을 적는다. 변경이 있으면 HEAD만으로 미커밋 작업을 식별할 수 없으므로 작업 트리 상태와 변경 파일을 함께 적는다. 다음 Agent는 실제 HEAD·작업 트리와 Handoff가 다르면 근거를 다시 확인한다.
 승인 대기, 권한 부족, 응답 중단 또는 외부 상태 대기는 실패로 추정하지 않고 `needs-decision`으로 반환한다. 같은 입력으로 대기나 재시도를 반복하지 않는다.
+모델 가용성이나 실행된 profile을 확인할 수 없다면 예상 설정을 실제 설정으로 쓰지 않는다. 강도 재판정이 있었다면 전환 전후의 값과 다음 시도에 적용한 profile을 기록한다.
