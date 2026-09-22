@@ -35,12 +35,14 @@
 
 | 순서 | 역할 | 문서 | 실행 조건 |
 | --- | --- | --- | --- |
-| 1 | Planner | `agents/planner.md` | 항상 |
+| 1 | Planner | `agents/planner.md` | 표준 경로에서 항상; 경량 경로에서는 생략 가능 |
 | 2 | Designer | `agents/designer.md` | UI·사용자 흐름 변경이 있을 때 |
 | 3 | Frontend Implementer | `agents/frontend.md` | 코드 변경이 있을 때 |
 | 4 | Reviewer | `agents/reviewer.md` | 코드 변경 후 항상 |
 
 선행 결과가 필요한 역할은 병렬로 실행하지 않는다. 서로 독립적인 조사나 파일 검사는 병렬로 진행할 수 있다.
+
+명확하고 되돌리기 쉬운 단일 파일 수정이나 문서 수정은 경량 경로를 사용할 수 있다. 이때 Coordinator가 목표·범위·검증 방법을 짧게 기록하고 Planner와 Designer를 생략한다. 의존성, 공용 API, UI 흐름, 빌드 설정, 보안·배포에 영향이 있거나 요구사항이 불명확하면 표준 경로를 사용한다. 사용자가 특정 역할이나 계획 승인을 요청했다면 경량 경로로 생략하지 않는다. 코드 변경 후 Reviewer 검토는 유지한다.
 
 ## 표준 실행 흐름
 
@@ -57,7 +59,7 @@ Designer 작업 (필요한 경우)
   ↓
 Frontend Implementer 작업
   ↓
-[Verification Gate: lint/test/build]
+[Verification Gate: lint/test/typecheck/build]
   ↓
 Reviewer 작업
   ├─ 수정 필요 → Frontend Implementer에게 반환
@@ -90,13 +92,16 @@ Agent가 다음 Agent에게 결과를 넘길 때 `docs/orchestration/handoff-tem
 
 - 목표
 - 확인한 파일과 근거
+- 작업 브랜치·HEAD와 작업 트리 상태, 변경 파일 소유자
 - 수행 내용
 - 산출물
+- 실행한 검증 명령별 결과와 실행 환경
 - 미확정 사항과 위험
 - 다음 Agent가 해야 할 작업
 - 완료 조건
 
 다음 Agent는 이전 결과를 그대로 신뢰하지 않고 필요한 파일과 검증 결과를 직접 확인한다.
+Reviewer는 Handoff의 HEAD·작업 트리 상태가 현재 검토 대상과 일치하는지 먼저 확인한다. 다르면 검증 근거를 갱신한다.
 
 ## 프론트엔드 코드 규칙
 
@@ -127,6 +132,7 @@ pnpm build
 ```
 
 관련 테스트를 추가하거나 갱신하고 위 명령을 순서대로 실행한다. 검증하지 못한 항목은 성공으로 보고하지 않고 이유를 남긴다.
+UI·사용자 흐름을 변경했다면 `docs/orchestration/ui-smoke-checklist.md`의 수동 브라우저 점검도 수행하고 결과를 Handoff에 기록한다.
 
 ## 오류 처리와 재시도
 
@@ -135,6 +141,8 @@ pnpm build
 - 재시도 전에는 원인을 분석하고 입력이나 접근 방식을 수정한다.
 - 같은 명령을 근거 없이 반복하지 않는다.
 - 2회 재시도 후에도 실패하면 즉시 중단하고 다음 역할로 넘기지 않는다.
+- 승인 대기, 권한 부족, 도구 응답 중단, 외부 상태 대기처럼 Agent가 자체 해결할 수 없는 경우에는 무작정 기다리거나 재시도하지 않는다. 명령·시도 횟수·마지막 상태·필요한 조치를 `needs-decision` Handoff로 Coordinator에게 즉시 알린다.
+- 병렬 작업은 Coordinator가 파일 소유자를 미리 지정한다. 의존성 설치, Git 반영, 외부 시스템 변경과 필요한 승인은 Coordinator가 조정한다.
 
 최종 실패 형식:
 

@@ -23,6 +23,8 @@
 이 버튼 버그를 Frontend와 Reviewer 역할로 나눠 수정해줘.
 ```
 
+명확하고 되돌리기 쉬운 단일 파일·문서 수정은 경량 경로를 사용할 수 있다. Coordinator가 짧은 계획과 검증 방법을 기록하고 Planner·Designer를 생략하되, 코드 변경의 Reviewer 검토는 유지한다. 의존성, 공용 API, UI 흐름, 빌드 설정, 보안·배포 영향이 있으면 표준 경로로 전환한다. 사용자가 지정한 역할은 생략하지 않는다.
+
 ## 기본 역할
 
 | 역할 | 하는 일 | 주요 산출물 |
@@ -49,7 +51,9 @@ Coordinator는 역할 문서의 내용을 직접 실행하는 척하지 않는�
 → 완료 또는 수정 반복
 ```
 
-Agent 사이의 결과 전달은 `handoff-template.md`, Gate 판정은 `gates.md`를 사용한다.
+Agent 사이의 결과 전달은 `handoff-template.md`, Gate 판정은 `gates.md`를 사용한다. Handoff에는 브랜치·HEAD·미커밋 변경과 검증 결과를 기록한다. 승인·권한·외부 상태로 진행이 멈추면 `needs-decision`으로 Coordinator에게 넘긴다.
+
+UI·사용자 흐름을 바꾼 작업은 [UI 수동 점검표](ui-smoke-checklist.md)로 주요 라우트, 모바일 폭, 키보드 조작을 확인한다. 자동 E2E 도구는 기능이 늘어 필요해질 때 도입한다.
 
 작업 강도별 모델과 reasoning effort 선택은 [Model Routing](model-routing.md)을 따른다. Codex 역할별 기본 설정은 `.codex/agents/`에서 관리한다.
 
@@ -58,7 +62,7 @@ Agent 사이의 결과 전달은 `handoff-template.md`, Gate 판정은 `gates.md
 - 프론트엔드 요구사항 분석
 - React 화면과 컴포넌트 구현
 - Router와 상태 흐름 설계
-- lint/build/test 검증
+- lint/test/typecheck/build 검증과 UI 변경 시 브라우저 점검
 - 코드 리뷰와 수정 반복
 
 실제 배포, 외부 서비스 변경, 비밀 정보 사용은 사용자의 별도 승인과 해당 도구 권한이 필요하다.

@@ -24,6 +24,7 @@ React, TypeScript와 Vite 기반의 화면·상태·상호작용을 구현한다
 - 반응형 스타일 적용
 - strict TypeScript 타입 안전성 유지
 - 린트, 테스트, 타입 검사, 빌드 확인
+- UI·사용자 흐름 변경 시 `docs/orchestration/ui-smoke-checklist.md` 점검
 
 ## 출력
 
@@ -35,13 +36,14 @@ React, TypeScript와 Vite 기반의 화면·상태·상호작용을 구현한다
 
 - 요구사항에 정의된 사용자 흐름이 구현돼 있다.
 - 기존 코드 구조와 파일 책임을 유지한다.
-- `pnpm lint`, `pnpm test`, `pnpm typecheck`, `pnpm build` 결과를 보고한다.
+- `pnpm lint`, `pnpm test`, `pnpm typecheck`, `pnpm build` 결과와 변경본의 브랜치·HEAD·작업 트리 상태를 보고한다.
 
 ## 넘김 규칙
 
 `docs/orchestration/gates.md`의 Implementation Gate와 Verification Gate를 확인한다. 구현 완료 후 검증 결과와 함께 리뷰 에이전트에게 검토를 요청한다.
 
 결과는 `docs/orchestration/handoff-template.md` 형식으로 작성한다.
+승인·권한·외부 상태 때문에 진행이 멈추면 반복 대기하지 않고 `needs-decision` Handoff를 Coordinator에게 즉시 보낸다.
 
 ## 오류 처리
 
