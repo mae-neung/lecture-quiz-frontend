@@ -26,6 +26,7 @@ pnpm dev
 | `pnpm test:watch` | 변경을 감시하며 테스트 실행 |
 | `pnpm typecheck` | strict TypeScript 타입 검사 |
 | `pnpm build` | 타입 검사 후 배포용 파일 생성 |
+| `pnpm verify` | lint, test, 타입 검사와 배포 빌드 전체 실행 |
 | `pnpm preview` | 배포용 빌드 미리 보기 |
 
 ## AI 오케스트레이션 사용법
@@ -102,11 +103,11 @@ src/
 - `any`로 타입 오류를 우회하지 않고 명시적 타입이나 `unknown` narrowing을 우선합니다.
 - 페이지는 화면 조립에 집중하고 API 통신과 복잡한 로직은 분리합니다.
 - 패키지는 pnpm으로만 관리합니다.
-- 코드 변경 후 `pnpm lint`, `pnpm test`, `pnpm typecheck`, `pnpm build`를 순서대로 확인합니다.
+- 작업 중에는 변경 위험과 영향 범위에 맞는 검증을 수행하고, PR 생성·업로드 전에는 최종 변경본으로 `pnpm verify`를 실행합니다. 이 명령은 lint, test와 타입 검사를 포함한 build를 순서대로 수행합니다.
 
 ## 지속적 통합
 
-GitHub Actions는 pull request와 `dev`, `prod` 브랜치 push에서 의존성을 frozen lockfile로 설치한 뒤 lint, test, type check/build를 실행합니다.
+GitHub Actions는 pull request와 `dev`, `prod` 브랜치 push에서 의존성을 frozen lockfile로 설치한 뒤 `pnpm verify`를 실행합니다.
 
 ## 환경 변수
 

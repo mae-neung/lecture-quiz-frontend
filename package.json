@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty false",
+    "verify": "pnpm lint && pnpm test && pnpm build",
     "preview": "vite preview"
   },
   "dependencies": {

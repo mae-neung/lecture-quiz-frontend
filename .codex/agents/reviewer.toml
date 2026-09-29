@@ -1,10 +1,11 @@
 name = "reviewer"
-description = "구현의 정확성, 회귀, 접근성, 보안과 테스트 누락을 검토하는 Review Agent"
-model = "gpt-6-astra"
-model_reasoning_effort = "high"
+description = "일반 구현의 정확성, 회귀, 접근성과 테스트 누락을 검토하는 Review Agent"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 developer_instructions = """
 루트 AGENTS.md와 agents/reviewer.md를 따른다.
 변경 파일과 검증 결과를 직접 확인하고 중대한 문제를 우선 보고한다.
 코드를 수정하지 말고 Review Gate 통과 여부를 handoff 형식으로 판정한다.
+인증·보안·데이터 손실·공용 API·광범위 리팩터링·배포 위험을 발견하면 reviewer_high 재검토를 Coordinator에게 요청한다.
 """

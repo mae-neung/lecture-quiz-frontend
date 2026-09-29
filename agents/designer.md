@@ -39,7 +39,7 @@ role: design
 
 `docs/orchestration/gates.md`의 Design Gate를 자체 확인한 뒤 화면 구조와 상태 정의를 프론트엔드 에이전트에게 넘긴다.
 
-결과는 `docs/orchestration/handoff-template.md` 형식으로 작성한다.
+정상 완료 결과는 `docs/orchestration/handoff-template.md`의 간소 Handoff로 작성한다. 고위험, 실패, 사용자 결정 대기는 전체 Handoff를 사용한다.
 
 ## 오류 처리
 
