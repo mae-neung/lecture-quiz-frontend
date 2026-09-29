@@ -1,6 +1,34 @@
 # Agent Handoff Template
 
-역할 사이의 결과를 넘길 때 아래 형식을 사용한다.
+역할 사이의 결과를 넘길 때 작업 성격에 맞는 형식을 하나 선택한다. 정상 완료한 읽기 전용 작업은 간소형을 사용하고, 코드 변경·고위험·PR·실패·결정 대기는 전체형을 사용한다.
+
+## 간소 Handoff
+
+```markdown
+## Handoff
+
+- From / To: <현재 역할> → <다음 역할>
+- Status: ready
+
+### 목표
+
+<이번 단계의 목표>
+
+### 핵심 근거
+
+- <다음 역할이 확인해야 할 파일과 사실>
+
+### 결정·산출물
+
+- <계획, 설계, 조사 결과>
+
+### 위험·다음 작업
+
+- <남은 위험; 없으면 없음>
+- <다음 역할이 수행할 작업>
+```
+
+## 전체 Handoff
 
 ```markdown
 ## Handoff
@@ -8,11 +36,8 @@
 - From: <현재 역할>
 - To: <다음 역할>
 - Status: ready | needs-decision | failed
-- Role / profile: <역할 / 실제 시작한 Agent profile; Agent 미사용 시 none>
-- Workload tier: <최초 강도 → 최종 강도; light-read | light-edit | standard-analysis | standard-implementation | high>
-- Model: <시작 후 확인한 실제 모델; 미확인 시 unverified>
-- Reasoning effort: <시작 후 확인한 값; 미확인 시 unverified>
-- Routing note: <판정 조건, 승격 시점·원인, fallback 또는 Agent 미사용 근거>
+- Verification level: <none | targeted | full-pr; 선택 근거>
+- Routing exception: <설정 불일치, 승격, fallback이 있을 때만 기록; 없으면 생략>
 - Branch / HEAD: <브랜치와 커밋 SHA; 코드 변경 전이면 기준 SHA>
 - Worktree / owner: <clean 또는 dirty와 변경 파일·담당 Agent>
 
@@ -24,13 +49,9 @@
 
 - <읽은 파일, 실행한 명령, 확인한 근거>
 
-### 수행 내용 또는 제안
+### 수행 내용·산출물
 
-- <현재 역할이 완료한 작업>
-
-### 산출물
-
-- <계획, 설계, 변경 파일, 검토 결과>
+- <변경 파일, 검토 결과, 결정 사항>
 
 ### 검증 근거
 
@@ -53,6 +74,6 @@
 ```
 
 Handoff에는 비밀 키, 비밀번호, 인증 토큰, 불필요한 개인정보를 포함하지 않는다.
-코드 변경이 없으면 변경 파일과 검증 항목에 `해당 없음`을 적는다. 변경이 있으면 HEAD만으로 미커밋 작업을 식별할 수 없으므로 작업 트리 상태와 변경 파일을 함께 적는다. 다음 Agent는 실제 HEAD·작업 트리와 Handoff가 다르면 근거를 다시 확인한다.
+간소형에는 코드 변경이 없는 항목을 `해당 없음`으로 반복해서 적지 않는다. 전체형에서 변경이 있으면 HEAD만으로 미커밋 작업을 식별할 수 없으므로 작업 트리 상태와 변경 파일을 함께 적는다. 다음 Agent는 실제 HEAD·작업 트리와 Handoff가 다르면 근거를 다시 확인한다.
 승인 대기, 권한 부족, 응답 중단 또는 외부 상태 대기는 실패로 추정하지 않고 `needs-decision`으로 반환한다. 같은 입력으로 대기나 재시도를 반복하지 않는다.
-모델 가용성이나 실행된 profile을 확인할 수 없다면 예상 설정을 실제 설정으로 쓰지 않는다. 강도 재판정이 있었다면 전환 전후의 값과 다음 시도에 적용한 profile을 기록한다.
+정상적인 모델 라우팅 정보는 Coordinator가 작업 단위로 한 번 기록한다. 모델 가용성이나 실행된 profile을 확인할 수 없다면 예상 설정을 실제 설정으로 쓰지 않으며, 설정 불일치·강도 승격·fallback이 있을 때만 전체형의 `Routing exception`에 남긴다.

@@ -6,5 +6,5 @@ sandbox_mode = "workspace-write"
 developer_instructions = """
 루트 AGENTS.md와 agents/frontend.md를 따른다.
 승인된 범위만 구현하고 pnpm만 사용한다.
-변경 후 AGENTS.md와 docs/orchestration/gates.md의 Verification Gate를 따라 lint, test, typecheck, build 결과를 Reviewer에게 전달한다.
+변경 후 AGENTS.md와 docs/orchestration/gates.md에 따라 범위에 맞는 검증 결과를 Reviewer에게 전달한다. PR 요청이 있으면 리뷰 반영 후 최종 변경본으로 전체 PR Gate를 수행한다.
 """
