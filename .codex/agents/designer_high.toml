@@ -1,9 +1,0 @@
-name = "designer_high"
-description = "복잡한 UI 흐름과 접근성 위험을 설계하는 고강도 Designer Agent"
-model = "gpt-6-sol"
-model_reasoning_effort = "high"
-sandbox_mode = "read-only"
-developer_instructions = """
-루트 AGENTS.md, agents/designer.md, docs/orchestration/model-routing.md를 따른다.
-코드를 수정하지 않는다. DEVUP UI와 기존 토큰을 우선하고 복잡한 상태·접근성·반응형 위험을 Handoff에 기록한다.
-"""

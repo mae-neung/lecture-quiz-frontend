@@ -64,7 +64,7 @@ Planner
 - [Gate 기준](docs/orchestration/gates.md)
 - [Agent Handoff 형식](docs/orchestration/handoff-template.md)
 - [모델 라우팅 기준](docs/orchestration/model-routing.md)
-- `agents/`: 역할별 책임과 완료 기준
+- 개인 Custom Agent는 `~/.codex/agents/`에서 공통 관리
 
 AI 도구마다 자동으로 읽는 안내 파일은 다릅니다. Codex 계열은 `AGENTS.md`, Claude Code는 `CLAUDE.md`를 진입점으로 사용하도록 구성했습니다. 그 외 도구에서는 루트 `AGENTS.md`를 먼저 읽도록 요청하세요.
 

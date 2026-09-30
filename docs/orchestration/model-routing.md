@@ -31,7 +31,7 @@ Planner의 표준 기본값은 계획 품질을 위해 `gpt-5.6-sol` / `high`를
 | 일반 코드 변경 후 리뷰 | `reviewer` | read-only |
 | 고위험·중요 리뷰 | `reviewer_high` | read-only |
 
-역할별 실행 설정의 단일 원본은 `.codex/agents/*.toml`이다. 탐색처럼 표에 없는 표준 읽기 작업은 내장 `explorer`에 `gpt-5.6-terra` / `medium`을 명시한다. 역할을 알 수 없는 임의 Agent를 기본값만 믿고 시작하지 않는다. 사용자가 Agent 분할을 요청하지 않은 경량 작업은 Coordinator가 단독 수행하며, 실행 중인 모델이 경량 모델로 바뀌었다고 보고하지 않는다. 코드 변경 시에는 Review Gate를 자체 점검하고 독립 검토가 아님을 기록한다. Agent 도구가 없으면 같은 판정·계획·검증·리뷰 단계를 순차 수행한다.
+역할별 실행 설정의 단일 원본은 `~/.codex/agents/*.toml`이다. 탐색처럼 표에 없는 표준 읽기 작업은 내장 `explorer`에 `gpt-5.6-terra` / `medium`을 명시한다. 역할을 알 수 없는 임의 Agent를 기본값만 믿고 시작하지 않는다. 사용자가 Agent 분할을 요청하지 않은 경량 작업은 Coordinator가 단독 수행하며, 실행 중인 모델이 경량 모델로 바뀌었다고 보고하지 않는다. 코드 변경 시에는 Review Gate를 자체 점검하고 독립 검토가 아님을 기록한다. Agent 도구가 없으면 같은 판정·계획·검증·리뷰 단계를 순차 수행한다.
 
 Codex Custom Agent TOML에 설정된 `model`과 `model_reasoning_effort`가 생성 요청의 override보다 우선한다. 따라서 기존 profile에 다른 모델을 넘겨 강도를 바꾸려 하지 말고, 위 profile 자체를 선택한다. 일반 Agent에 명시 모델을 사용하는 예외가 필요하면 역할 지침·권한·선택 근거를 Handoff에 적고, 읽기 전용 역할에 쓰기 권한을 주지 않는다.
 
