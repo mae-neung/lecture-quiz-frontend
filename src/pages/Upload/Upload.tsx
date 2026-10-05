@@ -55,38 +55,42 @@ function Upload() {
   return (
     <section className="upload-page">
       <div className="upload-page__heading">
-        <p className="page__eyebrow">자료 등록</p>
-        <h1>학습할 강의를 등록해 주세요</h1>
-        <p>영상 또는 교안을 선택해 등록 흐름을 체험할 수 있습니다.</p>
+        <p className="page__eyebrow">STEP 01 · 자료 등록</p>
+        <h1>이번 시험에 나올 강의 자료를 골라주세요.</h1>
+        <p>강의 영상이나 교안을 선택하면 문제 만들기 전 등록 흐름을 체험할 수 있어요.</p>
       </div>
 
       {registered ? (
         <div className="upload-result" role="status">
           <span className="upload-result__icon" aria-hidden="true">✓</span>
           <div>
-            <p className="upload-result__eyebrow">등록 화면 확인 완료</p>
+            <p className="upload-result__eyebrow">데모 등록 확인 완료</p>
             <h2>{registered.title}</h2>
             <dl>
               <div><dt>자료 유형</dt><dd>{registered.type === 'video' ? '강의 영상' : '강의 교안'}</dd></div>
               <div><dt>파일명</dt><dd>{registered.fileName}</dd></div>
               <div><dt>파일 크기</dt><dd>{(registered.fileSize / 1024 / 1024).toFixed(2)} MB</dd></div>
             </dl>
-            <p className="upload-result__notice">현재는 데모입니다. 실제 파일 전송, 저장, 분석 및 문제 생성은 진행되지 않았습니다.</p>
+            <p className="upload-result__notice">선택한 자료를 확인했어요. 현재는 데모라 실제 파일 전송·저장·분석은 진행되지 않으며, 문제 만들기 기능은 준비 중입니다.</p>
             <Button onClick={resetForm} variant="secondary">다른 자료 등록하기</Button>
           </div>
         </div>
       ) : (
         <div className="upload-page__content">
           <aside className="upload-guide" aria-label="등록 안내">
-            <span className="upload-guide__mark" aria-hidden="true">01 / 02</span>
-            <h2>자료를 준비하셨나요?</h2>
-            <p>강의명과 파일을 선택하면 등록 결과를 바로 미리 볼 수 있습니다.</p>
+            <span className="upload-guide__mark" aria-hidden="true">EXAM PREP · 01 / 02</span>
+            <h2>벼락치기도<br />순서가 중요해요.</h2>
+            <p>시험 범위에 해당하는 자료인지 확인하고 하나씩 등록해 보세요.</p>
             <ol>
               <li>자료 유형 선택</li>
               <li>강의명 입력</li>
               <li>파일 선택</li>
             </ol>
-            <p className="upload-guide__note">현재는 데모 화면으로 파일을 서버에 전송하지 않습니다.</p>
+            <div className="upload-guide__privacy">
+              <strong>자료를 올리기 전에</strong>
+              <p>저작권이 있거나 개인정보가 포함된 자료는 업로드 권한을 꼭 확인해 주세요.</p>
+            </div>
+            <p className="upload-guide__note">데모 화면으로, 선택한 파일은 서버에 전송되거나 저장되지 않습니다.</p>
           </aside>
 
           <form className="upload-form" onSubmit={handleSubmit} noValidate>
@@ -113,7 +117,7 @@ function Upload() {
               <input
                 id="lecture-title"
                 ref={titleInput}
-                placeholder="예: 데이터 분석 입문 1강"
+                placeholder="예: 경영통계 3주차 회귀분석"
                 value={title}
                 aria-invalid={Boolean(errors.title)}
                 aria-describedby={errors.title ? 'lecture-title-error' : undefined}
@@ -141,7 +145,7 @@ function Upload() {
             </div>
 
             {(errors.title || errors.file) && <p className="upload-form__alert" role="alert">입력 내용을 확인해 주세요.</p>}
-            <Button className="upload-form__submit" type="submit">자료 등록 확인</Button>
+            <Button className="upload-form__submit" type="submit">데모 등록 확인</Button>
           </form>
         </div>
       )}

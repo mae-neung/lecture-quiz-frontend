@@ -2,17 +2,17 @@
   "theme": {
     "colors": {
       "default": {
-        "text": "#172033",
-        "muted": "#596579",
-        "accent": "#2563eb",
-        "accentHover": "#1d4ed8",
-        "border": "#dbe2ea",
-        "surface": "#ffffff",
-        "surfaceMuted": "#f8fafc",
-        "danger": "#dc2626",
-        "dangerHover": "#b91c1c",
+        "text": "#28263f",
+        "muted": "#67627a",
+        "accent": "#4b4696",
+        "accentHover": "#373276",
+        "border": "#dcd7e7",
+        "surface": "#fffdf7",
+        "surfaceMuted": "#f4f0fb",
+        "danger": "#b4233f",
+        "dangerHover": "#8f1731",
         "onAccent": "#ffffff",
-        "focusRing": "rgb(37 99 235 / 35%)"
+        "focusRing": "rgb(75 70 150 / 38%)"
       }
     },
     "typography": {
@@ -26,7 +26,7 @@
         "controlHeight": "44px",
         "controlPaddingX": "16px",
         "controlPaddingY": "10px",
-        "controlRadius": "8px"
+        "controlRadius": "12px"
       }
     }
   }

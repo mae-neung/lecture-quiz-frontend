@@ -32,15 +32,15 @@ function Login() {
   return (
     <section className="login-page">
       <div className="login-page__intro">
-        <p className="page__eyebrow">시작하기</p>
-        <h1>강의 자료를 문제로 바꾸는 첫걸음</h1>
-        <p>강의 영상이나 교안을 등록하고 학습 문제를 준비해 보세요.</p>
+        <p className="page__eyebrow">아맞다, 공부해야지!</p>
+        <h1>시험 범위 정리,<br />강의 자료부터 가볍게.</h1>
+        <p>데모 계정으로 로그인하고 자료 등록 흐름을 미리 체험해 보세요.</p>
       </div>
 
       <form className="login-card" onSubmit={handleSubmit} noValidate>
         <div className="login-card__heading">
           <h2>로그인</h2>
-          <p>지금은 화면 체험을 위한 데모 로그인입니다.</p>
+          <p>대학생을 위한 아맞다시험 데모에 오신 걸 환영해요.</p>
         </div>
         <p className="login-card__demo" id="demo-account">
           체험 계정 <strong>test1234</strong> / 비밀번호 <strong>test1234</strong>
@@ -51,7 +51,7 @@ function Login() {
             id="login-username"
             autoComplete="username"
             aria-invalid={Boolean(error)}
-            aria-describedby={error ? 'login-error' : 'demo-account'}
+            aria-describedby={error ? 'demo-account login-error' : 'demo-account'}
             onChange={(event) => { setUsername(event.target.value); setError('') }}
             value={username}
           />
@@ -63,14 +63,14 @@ function Login() {
             type="password"
             autoComplete="current-password"
             aria-invalid={Boolean(error)}
-            aria-describedby={error ? 'login-error' : undefined}
+            aria-describedby={error ? 'demo-account login-error' : 'demo-account'}
             onChange={(event) => { setPassword(event.target.value); setError('') }}
             value={password}
           />
         </div>
         {error && <p className="form-error" id="login-error" role="alert">{error}</p>}
         <Button type="submit" className="login-card__submit">로그인하고 자료 등록하기</Button>
-        <p className="login-card__note">실제 계정 인증이나 자료 저장은 아직 제공하지 않습니다.</p>
+        <p className="login-card__note">데모 전용 화면입니다. 실제 계정 인증, 파일 전송 및 자료 저장은 제공하지 않습니다.</p>
       </form>
     </section>
   )

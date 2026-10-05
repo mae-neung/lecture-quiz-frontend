@@ -1,159 +1,50 @@
 :root {
-  font-family: Inter, Pretendard, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #172033;
-  background: #f8fafc;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  color: #28263f;
+  background: #f8f4e9;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  --color-text: #172033;
-  --color-muted: #596579;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-border: #dbe2ea;
-  --color-surface: #ffffff;
-  --color-code: #eef2ff;
+  --color-text: #28263f;
+  --color-muted: #67627a;
+  --color-accent: #4b4696;
+  --color-accent-hover: #373276;
+  --color-border: #dcd7e7;
+  --color-surface: #fffdf7;
+  --color-surface-muted: #f4f0fb;
+  --color-code: #ebe7fa;
+  --color-marker: #ffe36e;
+  --color-lavender: #ded8f4;
+  --color-danger: #b4233f;
+  --color-focus-ring: rgb(75 70 150 / 38%);
+  --shadow-card: 0 18px 45px rgb(54 46 92 / 9%);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  min-width: 320px;
-}
-
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
-}
-
-.page {
-  width: min(100%, 1280px);
-  margin: 0 auto;
-  padding: 48px;
-}
-
-.page__eyebrow {
-  margin: 0 0 8px;
-  color: var(--color-accent);
-  font-size: 0.8125rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.page__title {
-  margin: 0;
-  color: var(--color-text);
-  font-size: clamp(2rem, 4vw, 2.75rem);
-}
-
-.page__description {
-  margin: 12px 0 0;
-  color: var(--color-muted);
-  line-height: 1.6;
-}
-
-.page__link {
-  display: inline-block;
-  margin-top: 24px;
-  color: var(--color-accent);
-  font-weight: 700;
-}
-
-.folder-list {
-  display: grid;
-  gap: 12px;
-  max-width: 760px;
-  margin: 40px 0 0;
-}
-
-.folder-list div {
-  display: grid;
-  grid-template-columns: minmax(140px, 0.4fr) 1fr;
-  gap: 20px;
-  padding: 16px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: var(--color-surface);
-}
-
-.folder-list dt {
-  color: var(--color-accent);
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-weight: 800;
-}
-
-.folder-list dd {
-  margin: 0;
-  color: var(--color-muted);
-}
-
-@media (max-width: 700px) {
-  .page {
-    padding: 32px 20px;
-  }
-
-  .folder-list div {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-.form-field {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
-.form-field label {
-  font-weight: 700;
-}
-
-.form-field input {
-  width: 100%;
-  min-width: 0;
-  min-height: 46px;
-  padding: 11px 13px;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.form-field input[type='file'] {
-  overflow-wrap: anywhere;
-  padding: 10px;
-  font-size: 0.9rem;
-}
-
-.form-field input[aria-invalid='true'] {
-  border-color: var(--color-danger, #dc2626);
-}
-
-.form-field input:focus-visible,
-.upload-type__option:focus-within,
-a:focus-visible {
-  outline: 3px solid var(--color-focus-ring, rgb(37 99 235 / 35%));
-  outline-offset: 3px;
-}
-
-.form-hint,
-.form-error {
-  margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
+* { box-sizing: border-box; }
+html { min-width: 320px; scroll-behavior: smooth; }
+body { min-width: 320px; min-height: 100vh; margin: 0; background: linear-gradient(rgb(75 70 150 / 3%) 1px, transparent 1px) 0 0 / 100% 32px, #f8f4e9; }
+button, input, textarea, select { font: inherit; }
+a, button, input { -webkit-tap-highlight-color: transparent; }
+.page { width: min(100%, 1280px); margin: 0 auto; padding: 48px; }
+.page__eyebrow { margin: 0 0 12px; color: var(--color-accent); font-size: .8125rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.page__title { margin: 0; color: var(--color-text); font-size: clamp(2rem, 4vw, 2.75rem); }
+.page__description { margin: 12px 0 0; color: var(--color-muted); line-height: 1.7; }
+.page__link { display: inline-block; margin-top: 24px; color: var(--color-accent); font-weight: 800; }
+.folder-list { display: grid; gap: 12px; max-width: 760px; margin: 40px 0 0; }
+.folder-list div { display: grid; grid-template-columns: minmax(140px, .4fr) 1fr; gap: 20px; padding: 16px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); }
+.folder-list dt { color: var(--color-accent); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 800; }
+.folder-list dd { margin: 0; color: var(--color-muted); }
+.form-field { display: grid; gap: 9px; min-width: 0; }
+.form-field label { color: var(--color-text); font-size: .925rem; font-weight: 800; }
+.form-field input { width: 100%; min-width: 0; min-height: 48px; padding: 12px 14px; border: 1px solid var(--color-border); border-radius: 12px; background: #fff; color: var(--color-text); transition: border-color 160ms ease, box-shadow 160ms ease; }
+.form-field input::placeholder { color: #9993a8; }
+.form-field input[type="file"] { overflow-wrap: anywhere; padding: 10px; font-size: .9rem; }
+.form-field input[type="file"]::file-selector-button { min-height: 34px; margin-right: 12px; padding: 6px 12px; border: 0; border-radius: 8px; background: var(--color-code); color: var(--color-accent); font-weight: 800; cursor: pointer; }
+.form-field input[aria-invalid="true"] { border-color: var(--color-danger); box-shadow: 0 0 0 3px rgb(180 35 63 / 10%); }
+.form-field input:focus-visible, .upload-type__option:focus-within, a:focus-visible, button:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
+.form-hint, .form-error { margin: 0; font-size: .85rem; line-height: 1.55; }
 .form-hint { color: var(--color-muted); }
-.form-error { color: #b91c1c; }
+.form-error { color: var(--color-danger); font-weight: 700; }
+@media (max-width: 700px) { .page { padding: 32px 20px; } .folder-list div { grid-template-columns: 1fr; gap: 6px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
