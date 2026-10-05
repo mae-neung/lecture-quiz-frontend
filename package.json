@@ -1,5 +1,5 @@
 {
-  "name": "frontend-template",
+  "name": "lecture-quiz-frontend",
   "private": true,
   "packageManager": "pnpm@10.23.0",
   "engines": {

@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  min-height: 72px;
+  min-height: 80px;
   padding: 0 max(24px, calc((100vw - 1120px) / 2));
   border-bottom: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -22,7 +22,9 @@
 
 .app-header nav {
   display: flex;
+  align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .app-header nav a {
@@ -38,10 +40,25 @@
   color: var(--color-accent);
 }
 
+.app-header nav button {
+  min-height: 38px;
+  padding: 6px 12px;
+}
+
 @media (max-width: 540px) {
   .app-header {
     align-items: flex-start;
     flex-direction: column;
     padding-block: 16px;
+  }
+
+  .app-header nav {
+    width: 100%;
+    gap: 4px;
+  }
+
+  .app-header nav a,
+  .app-header nav button {
+    font-size: 0.875rem;
   }
 }

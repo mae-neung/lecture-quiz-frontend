@@ -1,0 +1,228 @@
+.upload-page {
+  width: min(100% - 40px, 1100px);
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 80px) 0 96px;
+}
+
+.upload-page__heading {
+  max-width: 650px;
+  margin-bottom: 40px;
+}
+
+.upload-page__heading h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+
+.upload-page__heading > p:last-child {
+  margin: 16px 0 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.upload-page__content {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.upload-guide,
+.upload-form,
+.upload-result {
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background: var(--color-surface);
+}
+
+.upload-guide {
+  padding: clamp(24px, 3vw, 36px);
+  background: #eef4ff;
+}
+
+.upload-guide__mark {
+  display: inline-block;
+  margin-bottom: 48px;
+  color: var(--color-accent);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.upload-guide h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.upload-guide p {
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.upload-guide ol {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0 0;
+  padding-left: 22px;
+  font-weight: 700;
+}
+
+.upload-guide__note {
+  margin: 40px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+.upload-form {
+  display: grid;
+  gap: 28px;
+  min-width: 0;
+  padding: clamp(24px, 3vw, 36px);
+  box-shadow: 0 20px 54px rgb(23 32 51 / 4%);
+}
+
+.upload-type {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.upload-type legend {
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.upload-type__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.upload-type__option {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.upload-type__option.is-selected {
+  border-color: var(--color-accent);
+  background: var(--color-code);
+}
+
+.upload-type__option input {
+  align-self: start;
+  margin: 4px 0 0;
+  accent-color: var(--color-accent);
+}
+
+.upload-type__option span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.upload-type__option small {
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+.upload-form__submit {
+  justify-self: start;
+  min-width: 170px;
+}
+
+.upload-form__alert {
+  margin: -8px 0;
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.upload-result {
+  display: flex;
+  gap: 24px;
+  max-width: 720px;
+  padding: clamp(24px, 4vw, 40px);
+}
+
+.upload-result__icon {
+  display: grid;
+  flex: 0 0 42px;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 800;
+}
+
+.upload-result > div {
+  min-width: 0;
+}
+
+.upload-result__eyebrow {
+  margin: 0 0 8px;
+  color: #166534;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.upload-result h2 {
+  overflow-wrap: anywhere;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.upload-result dl {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.upload-result dl div {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.upload-result dt {
+  color: var(--color-muted);
+}
+
+.upload-result dd {
+  overflow-wrap: anywhere;
+  min-width: 0;
+  margin: 0;
+  font-weight: 700;
+}
+
+.upload-result__notice {
+  margin: 0 0 24px;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 750px) {
+  .upload-page__content { grid-template-columns: 1fr; }
+  .upload-guide__mark { margin-bottom: 16px; }
+  .upload-guide ol { margin-top: 20px; }
+  .upload-guide__note { margin-top: 24px; }
+}
+
+@media (max-width: 480px) {
+  .upload-page { width: min(100% - 32px, 1100px); }
+  .upload-type__options { grid-template-columns: 1fr; }
+  .upload-form__submit { width: 100%; }
+  .upload-result { gap: 14px; }
+  .upload-result dl div { grid-template-columns: 1fr; gap: 3px; }
+  .upload-result button { width: 100%; }
+}

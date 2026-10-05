@@ -1,27 +1,30 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '@/features/auth/useAuth'
 import './Home.css'
 
-const foundations = [
-  'React 19과 Vite 8',
-  'React Router 기본 구성',
-  'pnpm 패키지 관리',
-  'AI Agent 작업 규칙',
-]
-
 function Home() {
+  const { isLoggedIn } = useAuth()
+
   return (
     <section className="page home">
-      <p className="page__eyebrow">Starter</p>
-      <h1 className="page__title">프론트엔드 작업을 시작하는 기본 템플릿</h1>
-      <p className="page__description">
-        화면 코드는 단순하게 유지하고, 저장소의 AI Agent가 계획·구현·검토 역할을 나눠 작업할 수 있도록 구성합니다.
-      </p>
-
-      <ul className="home__foundations">
-        {foundations.map((foundation) => <li key={foundation}>{foundation}</li>)}
-      </ul>
-
-      <Link className="home__link" to="/about">템플릿 구조 보기</Link>
+      <div className="home__copy">
+        <p className="page__eyebrow">나만의 강의 학습 공간</p>
+        <h1>강의 자료에서<br />문제 풀이까지</h1>
+        <p>강의 영상과 교안을 등록하고, 학습 문제를 만드는 과정을 시작해 보세요.</p>
+        <Link className="home__link" to={isLoggedIn ? '/upload' : '/login'}>
+          {isLoggedIn ? '강의 자료 등록하기' : '데모 로그인 시작하기'}
+        </Link>
+        <p className="home__notice">현재는 로그인과 자료 등록 화면을 체험할 수 있습니다.</p>
+      </div>
+      <div className="home__preview" aria-hidden="true">
+        <div className="home__preview-top"><span>LECTURE / 01</span><span>● ● ●</span></div>
+        <div className="home__preview-icon">▶</div>
+        <div className="home__preview-card">
+          <span>강의 자료</span>
+          <strong>새로운 학습을 시작하세요</strong>
+          <i />
+        </div>
+      </div>
     </section>
   )
 }
