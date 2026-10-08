@@ -6,6 +6,7 @@ import About from '@/pages/About/About'
 import Home from '@/pages/Home/Home'
 import Login from '@/pages/Login/Login'
 import NotFound from '@/pages/NotFound/NotFound'
+import Quiz from '@/pages/Quiz/Quiz'
 import Upload from '@/pages/Upload/Upload'
 
 function AppRouter() {
@@ -18,6 +19,7 @@ function AppRouter() {
             <Route path="login" element={<Login />} />
             <Route element={<RequireDemoLogin />}>
               <Route path="upload" element={<Upload />} />
+              <Route path="quiz" element={<Quiz />} />
             </Route>
             <Route path="about" element={<About />} />
             <Route path="*" element={<NotFound />} />

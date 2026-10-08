@@ -16,7 +16,7 @@ function Home() {
             {isLoggedIn ? '강의 자료 등록하기' : '데모로 먼저 써보기'}
             <span aria-hidden="true">→</span>
           </Link>
-          <p className="home__notice">데모에서는 로그인과 자료 등록 화면만 체험할 수 있으며, 실제 파일은 전송되거나 저장되지 않습니다.</p>
+          <p className="home__notice">데모에서는 로그인, 자료 등록과 목업 문제 풀이를 체험할 수 있으며 실제 파일과 풀이 기록은 저장되지 않습니다.</p>
         </div>
         <div className="home__planner" aria-label="아맞다시험 학습 플래너 예시">
           <div className="home__planner-binding" aria-hidden="true"><i /><i /><i /><i /></div>
@@ -48,10 +48,10 @@ function Home() {
             <div><strong>강의 자료 등록</strong><p>영상이나 PDF·PPT 교안을 선택해요.</p></div>
             <span className="home__step-state">지금 체험 가능</span>
           </li>
-          <li className="is-upcoming">
+          <li>
             <span className="home__step-number">02</span>
             <div><strong>문제로 연습하기</strong><p>생성된 문제를 풀며 시험 범위를 점검해요.</p></div>
-            <span className="home__step-state">준비 중</span>
+            <Link className="home__step-state" to="/quiz">지금 체험 가능</Link>
           </li>
         </ol>
       </section>

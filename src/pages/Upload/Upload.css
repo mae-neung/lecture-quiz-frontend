@@ -36,5 +36,8 @@
 .upload-result dt { color: var(--color-muted); }
 .upload-result dd { overflow-wrap: anywhere; min-width: 0; margin: 0; font-weight: 800; }
 .upload-result__notice { margin: 0 0 24px; padding: 14px 16px; border-radius: 11px; background: var(--color-surface-muted); color: var(--color-muted); line-height: 1.65; }
+.upload-result__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.upload-result__quiz-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 12px; background: var(--color-accent); color: white; font-weight: 700; text-decoration: none; }
+.upload-result__quiz-link:hover { background: var(--color-accent-hover); }
 @media (max-width: 750px) { .upload-page__content { grid-template-columns: 1fr; } .upload-guide__mark { margin-bottom: 20px; } .upload-guide ol { margin-top: 20px; } .upload-guide__privacy { margin-top: 26px; } }
-@media (max-width: 480px) { .upload-page { width: min(100% - 32px, 1100px); padding-top: 40px; } .upload-page__heading { margin-bottom: 32px; } .upload-page__heading h1 { font-size: 2.25rem; } .upload-type__options { grid-template-columns: 1fr; } .upload-form { padding: 26px 20px; } .upload-form__submit { width: 100%; } .upload-result { gap: 14px; padding: 28px 20px; } .upload-result dl div { grid-template-columns: 1fr; gap: 3px; } .upload-result button { width: 100%; } }
+@media (max-width: 480px) { .upload-page { width: min(100% - 32px, 1100px); padding-top: 40px; } .upload-page__heading { margin-bottom: 32px; } .upload-page__heading h1 { font-size: 2.25rem; } .upload-type__options { grid-template-columns: 1fr; } .upload-form { padding: 26px 20px; } .upload-form__submit { width: 100%; } .upload-result { gap: 14px; padding: 28px 20px; } .upload-result dl div { grid-template-columns: 1fr; gap: 3px; } .upload-result__actions > * { width: 100%; } }

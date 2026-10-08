@@ -16,6 +16,7 @@ function AppLayout() {
         <nav aria-label="주요 메뉴">
           <NavLink end to="/">홈</NavLink>
           <NavLink to="/upload">자료 등록</NavLink>
+          <NavLink to="/quiz">문제 풀이</NavLink>
           {isLoggedIn ? <Button variant="secondary" onClick={logout}>로그아웃</Button> : <NavLink to="/login">로그인</NavLink>}
         </nav>
       </header>

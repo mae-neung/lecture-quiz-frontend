@@ -12,7 +12,7 @@ async function signIn() {
   const user = userEvent.setup()
   await user.type(screen.getByLabelText('아이디'), 'test1234')
   await user.type(screen.getByLabelText('비밀번호'), 'test1234')
-  await user.click(screen.getByRole('button', { name: '로그인하고 자료 등록하기' }))
+  await user.click(screen.getByRole('button', { name: '로그인하고 시작하기' }))
   return user
 }
 
@@ -40,7 +40,7 @@ describe('AppRouter', () => {
     const user = userEvent.setup()
     await user.type(screen.getByLabelText('아이디'), 'wrong')
     await user.type(screen.getByLabelText('비밀번호'), 'wrong')
-    await user.click(screen.getByRole('button', { name: '로그인하고 자료 등록하기' }))
+    await user.click(screen.getByRole('button', { name: '로그인하고 시작하기' }))
     expect(screen.getByRole('alert')).toHaveTextContent('아이디 또는 비밀번호를 확인해 주세요.')
     expect(screen.getByLabelText('아이디')).toHaveAttribute('aria-describedby', expect.stringContaining('login-error'))
     expect(screen.getByLabelText('비밀번호')).toHaveAttribute('aria-describedby', expect.stringContaining('login-error'))
@@ -50,7 +50,7 @@ describe('AppRouter', () => {
     await user.clear(screen.getByLabelText('비밀번호'))
     await user.type(screen.getByLabelText('아이디'), 'test1234')
     await user.type(screen.getByLabelText('비밀번호'), 'test1234')
-    await user.click(screen.getByRole('button', { name: '로그인하고 자료 등록하기' }))
+    await user.click(screen.getByRole('button', { name: '로그인하고 시작하기' }))
 
     expect(window.location.hash).toBe('#/upload?source=home')
     expect(screen.getByRole('heading', { name: '이번 시험에 나올 강의 자료를 골라주세요.' })).toBeInTheDocument()
@@ -95,7 +95,8 @@ describe('AppRouter', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('데이터 분석 1강')
     expect(screen.getByRole('status')).toHaveTextContent('lecture.pdf')
-    expect(screen.getByRole('status')).toHaveTextContent('실제 파일 전송·저장·분석은 진행되지 않으며, 문제 만들기 기능은 준비 중입니다.')
+    expect(screen.getByRole('status')).toHaveTextContent('준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요.')
+    expect(screen.getByRole('link', { name: '목업 문제 풀기' })).toHaveAttribute('href', '#/quiz')
 
     await user.click(screen.getByRole('button', { name: '다른 자료 등록하기' }))
     expect(screen.getByLabelText('강의명')).toHaveValue('')

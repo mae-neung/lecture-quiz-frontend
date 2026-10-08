@@ -32,6 +32,7 @@
 .home__steps strong { font-size: 1.2rem; }
 .home__steps p { margin: 9px 0 0; color: #dedaf2; line-height: 1.65; }
 .home__step-state { align-self: end; justify-self: start; padding: 7px 10px; border-radius: 8px; background: var(--color-marker); color: #40391d; font-size: .75rem; font-weight: 900; }
+.home__steps a.home__step-state { text-decoration: none; }
 .home__steps .is-upcoming { background: rgb(30 27 70 / 19%); }
 .home__steps .is-upcoming .home__step-state { background: rgb(255 255 255 / 14%); color: white; }
 @media (max-width: 790px) { .home__hero { grid-template-columns: 1fr; width: min(100% - 40px, 620px); padding-block: 52px 80px; } .home__planner { width: min(100% - 14px, 500px); margin: 0 auto; transform: none; } }

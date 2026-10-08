@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import Button from '@/components/Button/Button'
 import { validateLecture } from '@/features/upload/validateLecture'
 import type { LectureErrors, LectureType } from '@/features/upload/validateLecture'
@@ -71,8 +72,11 @@ function Upload() {
               <div><dt>파일명</dt><dd>{registered.fileName}</dd></div>
               <div><dt>파일 크기</dt><dd>{(registered.fileSize / 1024 / 1024).toFixed(2)} MB</dd></div>
             </dl>
-            <p className="upload-result__notice">선택한 자료를 확인했어요. 현재는 데모라 실제 파일 전송·저장·분석은 진행되지 않으며, 문제 만들기 기능은 준비 중입니다.</p>
-            <Button onClick={resetForm} variant="secondary">다른 자료 등록하기</Button>
+            <p className="upload-result__notice">선택한 자료를 확인했어요. 실제 파일 분석 결과 대신 준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요.</p>
+            <div className="upload-result__actions">
+              <Link className="upload-result__quiz-link" to="/quiz">목업 문제 풀기</Link>
+              <Button onClick={resetForm} variant="secondary">다른 자료 등록하기</Button>
+            </div>
           </div>
         </div>
       ) : (
