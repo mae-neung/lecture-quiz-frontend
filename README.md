@@ -52,3 +52,7 @@ pnpm verify
 공개 사이트: [https://mae-neung.github.io/lecture-quiz-frontend/](https://mae-neung.github.io/lecture-quiz-frontend/)
 
 `main` 브랜치에 변경이 올라오면 GitHub Actions가 전체 검증과 빌드를 실행한 뒤 GitHub Pages에 배포합니다. GitHub Pages에서 화면을 직접 새로고침해도 동작하도록 해시 라우팅을 사용합니다.
+
+## 지속적 통합
+
+GitHub Actions는 pull request와 `main`, `codex/**` 브랜치 push에서 의존성을 frozen lockfile로 설치한 뒤 `pnpm verify`를 실행합니다. 이 저장소는 배포 기준 브랜치가 `main`이고 별도 `dev` 브랜치가 없으므로, 템플릿의 `codex/** → dev` 자동 승격 워크플로는 적용하지 않습니다. 기능 브랜치는 검증 후 pull request로 `main`에 반영합니다.
