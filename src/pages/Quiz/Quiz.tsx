@@ -1,20 +1,24 @@
 import { Box, Flex, Grid, Text } from '@devup-ui/react'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Button from '@/components/Button/Button'
+import { readLibrary } from '@/features/library/libraryStorage'
 import { mockQuizQuestions } from '@/features/quiz/mockQuestions'
 import { getCorrectCount, getFirstUnansweredIndex, getQuizScore } from '@/features/quiz/scoreQuiz'
 import type { QuizAnswers } from '@/features/quiz/types'
 
-function Quiz() {
+function QuizContent({ id }: { id?: string }) {
   const navigate = useNavigate()
+  const savedLibrary = id ? readLibrary() : null
+  const savedSet = savedLibrary?.ok ? savedLibrary.value.find((set) => set.id === id) : undefined
+  const questions = savedSet?.questions ?? mockQuizQuestions
   const [answers, setAnswers] = useState<QuizAnswers>({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const questionHeading = useRef<HTMLHeadingElement>(null)
   const resultHeading = useRef<HTMLHeadingElement>(null)
-  const question = mockQuizQuestions[currentIndex]
+  const question = questions[currentIndex]
   const answeredCount = Object.keys(answers).length
 
   useEffect(() => {
@@ -35,7 +39,7 @@ function Quiz() {
   }
 
   function gradeQuiz() {
-    const firstUnanswered = getFirstUnansweredIndex(mockQuizQuestions, answers)
+    const firstUnanswered = getFirstUnansweredIndex(questions, answers)
     if (firstUnanswered >= 0) {
       setCurrentIndex(firstUnanswered)
       setSubmitError(`${firstUnanswered + 1}번 문제부터 답을 선택해 주세요.`)
@@ -54,9 +58,17 @@ function Quiz() {
     requestAnimationFrame(() => questionHeading.current?.focus())
   }
 
+  if (id && (!savedLibrary?.ok || !savedSet)) return (
+    <Box as="section" maxW="960px" mx="auto" px="20px" py="56px">
+      <Text as="h1" color="$text">문제 세트를 열 수 없어요</Text>
+      <Text as="p" color="$muted" role={savedLibrary && !savedLibrary.ok ? 'alert' : undefined}>{savedLibrary && !savedLibrary.ok ? savedLibrary.error : '삭제되었거나 주소가 달라졌을 수 있어요.'}</Text>
+      <Link to="/library">보관함으로 돌아가기</Link>
+    </Box>
+  )
+
   if (isComplete) {
-    const correctCount = getCorrectCount(mockQuizQuestions, answers)
-    const score = getQuizScore(mockQuizQuestions, answers)
+    const correctCount = getCorrectCount(questions, answers)
+    const score = getQuizScore(questions, answers)
 
     return (
       <Box as="section" maxW="1000px" mx="auto" px={["16px", "24px"]} py={["40px", "64px"]}>
@@ -70,7 +82,7 @@ function Quiz() {
             <Text as="p" fontSize={["54px", "72px"]} fontWeight={900} letterSpacing="-0.06em" lineHeight={1} mb={0} mt="8px">{score}점</Text>
           </Box>
           <Flex alignItems={["flex-start", "center"]} borderLeft={["0", "1px solid"]} borderTop={["1px solid", "0"]} borderColor="$focusRing" flexDirection="column" justifyContent="center" pl={[0, "30px"]} pt={["18px", 0]}>
-            <Text as="p" fontSize="24px" fontWeight={900} m={0}>{correctCount} / {mockQuizQuestions.length} 정답</Text>
+            <Text as="p" fontSize="24px" fontWeight={900} m={0}>{correctCount} / {questions.length} 정답</Text>
             <Text as="p" lineHeight={1.6} mb={0} mt="6px" opacity={0.82}>틀린 문제의 해설을 확인하고 다시 도전해 보세요.</Text>
           </Flex>
         </Grid>
@@ -78,12 +90,13 @@ function Quiz() {
         <Flex flexWrap="wrap" gap="10px" mt="20px">
           <Button onClick={restartQuiz}>다시 풀기</Button>
           <Button onClick={() => navigate('/upload')} variant="secondary">자료 등록으로 돌아가기</Button>
+          {id && <Button onClick={() => navigate(`/library/${id}`)} variant="secondary">세트 관리</Button>}
         </Flex>
 
         <Box mt="52px">
           <Text as="h2" color="$text" fontSize="28px" letterSpacing="-0.04em" mb="20px" mt={0}>문항별 해설</Text>
           <Grid gap="14px">
-            {mockQuizQuestions.map((item, index) => {
+            {questions.map((item, index) => {
               const selectedId = answers[item.id]
               const selected = item.options.find((option) => option.id === selectedId)
               const correct = item.options.find((option) => option.id === item.correctOptionId)
@@ -111,17 +124,17 @@ function Quiz() {
   return (
     <Box as="section" maxW="1000px" mx="auto" px={["16px", "24px"]} py={["40px", "64px"]}>
       <Text as="p" color="$accent" fontSize="13px" fontWeight={900} letterSpacing="0.08em" m={0}>STEP 02 · 문제 풀이</Text>
-      <Text as="h1" color="$text" fontSize={["36px", "52px"]} letterSpacing="-0.055em" lineHeight={1.15} mb="12px" mt="12px">핵심 개념을 문제로 확인해요.</Text>
-      <Text as="p" color="$muted" lineHeight={1.7} m={0}>5개의 목업 문제입니다. 답안은 이동해도 유지되지만 새로고침하면 초기화돼요.</Text>
+      <Text as="h1" color="$text" fontSize={["36px", "52px"]} letterSpacing="-0.055em" lineHeight={1.15} mb="12px" mt="12px">{savedSet ? `${savedSet.title} 문제 풀기` : '핵심 개념을 문제로 확인해요.'}</Text>
+      <Text as="p" color="$muted" lineHeight={1.7} m={0}>{questions.length}개의 목업 문제입니다. 답안은 이동해도 유지되지만 새로고침하면 초기화돼요.</Text>
 
       <Grid alignItems="start" gap="20px" gridTemplateColumns={["1fr", "220px minmax(0, 1fr)"]} mt="36px">
         <Box as="aside" bg="$surfaceMuted" borderColor="$border" borderRadius="18px" borderStyle="solid" borderWidth="1px" p="20px">
           <Flex alignItems="center" justifyContent="space-between">
             <Text as="h2" color="$text" fontSize="16px" m={0}>문제 이동</Text>
-            <Text as="span" color="$muted" fontSize="13px">{answeredCount}/{mockQuizQuestions.length} 답변</Text>
+            <Text as="span" color="$muted" fontSize="13px">{answeredCount}/{questions.length} 답변</Text>
           </Flex>
           <Grid aria-label="문제 바로가기" gap="8px" gridTemplateColumns="repeat(3, minmax(0, 1fr))" mt="16px" role="navigation">
-            {mockQuizQuestions.map((item, index) => (
+            {questions.map((item, index) => (
               <Button
                 aria-current={index === currentIndex ? 'step' : undefined}
                 aria-label={`${index + 1}번 문제${answers[item.id] ? ', 답변 완료' : ''}`}
@@ -138,7 +151,7 @@ function Quiz() {
         </Box>
 
         <Box bg="$surface" borderColor="$border" borderRadius="22px" borderStyle="solid" borderWidth="1px" p={["22px", "34px"]}>
-          <Text as="p" color="$accent" fontSize="13px" fontWeight={900} m={0}>QUESTION {currentIndex + 1} / {mockQuizQuestions.length}</Text>
+          <Text as="p" color="$accent" fontSize="13px" fontWeight={900} m={0}>QUESTION {currentIndex + 1} / {questions.length}</Text>
           <Text as="h2" color="$text" fontSize={["23px", "28px"]} letterSpacing="-0.035em" lineHeight={1.45} mb="26px" mt="10px" ref={questionHeading} tabIndex={-1}>{question.prompt}</Text>
 
           <Grid as="fieldset" border={0} gap="10px" m={0} p={0}>
@@ -180,14 +193,19 @@ function Quiz() {
           <Flex flexWrap="wrap" gap="10px" justifyContent="space-between" mt="28px">
             <Button disabled={currentIndex === 0} onClick={() => moveTo(currentIndex - 1)} variant="secondary">이전 문제</Button>
             <Flex flexWrap="wrap" gap="10px">
-              {currentIndex < mockQuizQuestions.length - 1 && <Button onClick={() => moveTo(currentIndex + 1)}>다음 문제</Button>}
-              <Button aria-describedby={submitError ? 'quiz-submit-error' : undefined} onClick={gradeQuiz} variant={currentIndex === mockQuizQuestions.length - 1 ? 'primary' : 'secondary'}>채점하기</Button>
+              {currentIndex < questions.length - 1 && <Button onClick={() => moveTo(currentIndex + 1)}>다음 문제</Button>}
+              <Button aria-describedby={submitError ? 'quiz-submit-error' : undefined} onClick={gradeQuiz} variant={currentIndex === questions.length - 1 ? 'primary' : 'secondary'}>채점하기</Button>
             </Flex>
           </Flex>
         </Box>
       </Grid>
     </Box>
   )
+}
+
+function Quiz() {
+  const { id } = useParams()
+  return <QuizContent id={id} key={id ?? 'mock'} />
 }
 
 export default Quiz

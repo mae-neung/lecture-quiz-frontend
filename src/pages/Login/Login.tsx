@@ -14,7 +14,7 @@ function Login() {
   const [error, setError] = useState('')
   const state: unknown = location.state
   const from = typeof state === 'object' && state !== null && 'from' in state &&
-    typeof state.from === 'string' && /^\/(?:upload|quiz)(?:[?#]|$)/.test(state.from)
+    typeof state.from === 'string' && /^\/(?:upload|quiz(?:\/[A-Za-z0-9_-]+)?|library(?:\/[A-Za-z0-9_-]+)?)(?:[?#]|$)/.test(state.from)
     ? state.from
     : '/upload'
 
@@ -70,7 +70,7 @@ function Login() {
         </div>
         {error && <p className="form-error" id="login-error" role="alert">{error}</p>}
         <Button type="submit" className="login-card__submit">로그인하고 시작하기</Button>
-        <p className="login-card__note">데모 전용 화면입니다. 실제 계정 인증, 파일 전송 및 자료 저장은 제공하지 않습니다.</p>
+        <p className="login-card__note">데모 전용 화면입니다. 실제 계정 인증과 파일 전송은 제공하지 않습니다. 문제 세트는 현재 브라우저에 저장됩니다.</p>
       </form>
     </section>
   )

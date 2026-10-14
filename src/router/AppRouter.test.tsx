@@ -18,6 +18,7 @@ async function signIn() {
 
 beforeEach(() => {
   window.sessionStorage.clear()
+  window.localStorage.clear()
 })
 
 describe('AppRouter', () => {
@@ -96,7 +97,7 @@ describe('AppRouter', () => {
     expect(screen.getByRole('status')).toHaveTextContent('데이터 분석 1강')
     expect(screen.getByRole('status')).toHaveTextContent('lecture.pdf')
     expect(screen.getByRole('status')).toHaveTextContent('준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요.')
-    expect(screen.getByRole('link', { name: '목업 문제 풀기' })).toHaveAttribute('href', '#/quiz')
+    expect(screen.getByRole('link', { name: '저장한 문제 풀기' })).toHaveAttribute('href', expect.stringMatching(/^#\/quiz\//))
 
     await user.click(screen.getByRole('button', { name: '다른 자료 등록하기' }))
     expect(screen.getByLabelText('강의명')).toHaveValue('')
