@@ -5,6 +5,8 @@ import AppLayout from '@/layouts/AppLayout/AppLayout'
 import About from '@/pages/About/About'
 import Home from '@/pages/Home/Home'
 import Login from '@/pages/Login/Login'
+import Library from '@/pages/Library/Library'
+import LibraryDetail from '@/pages/LibraryDetail/LibraryDetail'
 import NotFound from '@/pages/NotFound/NotFound'
 import Quiz from '@/pages/Quiz/Quiz'
 import Upload from '@/pages/Upload/Upload'
@@ -20,6 +22,9 @@ function AppRouter() {
             <Route element={<RequireDemoLogin />}>
               <Route path="upload" element={<Upload />} />
               <Route path="quiz" element={<Quiz />} />
+              <Route path="quiz/:id" element={<Quiz />} />
+              <Route path="library" element={<Library />} />
+              <Route path="library/:id" element={<LibraryDetail />} />
             </Route>
             <Route path="about" element={<About />} />
             <Route path="*" element={<NotFound />} />

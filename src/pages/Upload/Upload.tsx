@@ -2,11 +2,13 @@ import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '@/components/Button/Button'
+import { createSavedSet } from '@/features/library/libraryStorage'
 import { validateLecture } from '@/features/upload/validateLecture'
 import type { LectureErrors, LectureType } from '@/features/upload/validateLecture'
 import './Upload.css'
 
 type RegisteredLecture = {
+  id: string
   type: LectureType
   title: string
   fileName: string
@@ -24,15 +26,18 @@ function Upload() {
   const [file, setFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<LectureErrors>({})
   const [registered, setRegistered] = useState<RegisteredLecture | null>(null)
+  const [saveError, setSaveError] = useState('')
   const titleInput = useRef<HTMLInputElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 
   function resetForm() {
+    if (fileInput.current) fileInput.current.value = ''
     setType('video')
     setTitle('')
     setFile(null)
     setErrors({})
     setRegistered(null)
+    setSaveError('')
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -50,7 +55,13 @@ function Upload() {
     }
     if (!file) return
 
-    setRegistered({ type, title: title.trim(), fileName: file.name, fileSize: file.size })
+    const saved = createSavedSet({ materialType: type, title: title.trim(), fileName: file.name, fileSize: file.size })
+    if (!saved.ok) {
+      setSaveError(saved.error)
+      return
+    }
+    setSaveError('')
+    setRegistered({ id: saved.value.id, type, title: saved.value.title, fileName: file.name, fileSize: file.size })
   }
 
   return (
@@ -72,9 +83,10 @@ function Upload() {
               <div><dt>파일명</dt><dd>{registered.fileName}</dd></div>
               <div><dt>파일 크기</dt><dd>{(registered.fileSize / 1024 / 1024).toFixed(2)} MB</dd></div>
             </dl>
-            <p className="upload-result__notice">선택한 자료를 확인했어요. 실제 파일 분석 결과 대신 준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요.</p>
+            <p className="upload-result__notice">문제 세트를 이 브라우저에 저장했어요. 실제 파일 분석 결과 대신 준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요. 원본 파일은 저장되지 않았어요.</p>
             <div className="upload-result__actions">
-              <Link className="upload-result__quiz-link" to="/quiz">목업 문제 풀기</Link>
+              <Link className="upload-result__quiz-link" to={`/quiz/${registered.id}`}>저장한 문제 풀기</Link>
+              <Link className="upload-result__quiz-link" to={`/library/${registered.id}`}>문제 세트 관리</Link>
               <Button onClick={resetForm} variant="secondary">다른 자료 등록하기</Button>
             </div>
           </div>
@@ -94,7 +106,7 @@ function Upload() {
               <strong>자료를 올리기 전에</strong>
               <p>저작권이 있거나 개인정보가 포함된 자료는 업로드 권한을 꼭 확인해 주세요.</p>
             </div>
-            <p className="upload-guide__note">데모 화면으로, 선택한 파일은 서버에 전송되거나 저장되지 않습니다.</p>
+            <p className="upload-guide__note">원본 파일은 서버에 전송되거나 저장되지 않습니다. 파일명과 목업 문제는 이 브라우저에 저장됩니다.</p>
           </aside>
 
           <form className="upload-form" onSubmit={handleSubmit} noValidate>
@@ -149,6 +161,7 @@ function Upload() {
             </div>
 
             {(errors.title || errors.file) && <p className="upload-form__alert" role="alert">입력 내용을 확인해 주세요.</p>}
+            {saveError && <p className="upload-form__alert" role="alert">{saveError}</p>}
             <Button className="upload-form__submit" type="submit">데모 등록 확인</Button>
           </form>
         </div>
