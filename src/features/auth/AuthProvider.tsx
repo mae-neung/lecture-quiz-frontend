@@ -1,41 +1,47 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
+import { isApiMode, loginApi, logoutApi } from '@/services/api'
+import { apiSessionKey } from '@/services/apiStorage'
 
 const SESSION_KEY = 'lecture-quiz-demo-session'
 
-function readSession() {
+function readSession(): string | null {
   try {
-    return window.sessionStorage.getItem(SESSION_KEY) === 'active'
+    if (isApiMode) return window.sessionStorage.getItem(apiSessionKey())?.trim() || null
+    return window.sessionStorage.getItem(SESSION_KEY) === 'active' ? 'demo' : null
   } catch {
-    return false
+    return null
   }
 }
 
 function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(readSession)
+  const [userId, setUserId] = useState(readSession)
 
-  function login(username: string, password: string) {
-    if (username !== 'test1234' || password !== 'test1234') return false
+  async function login(username: string, password: string) {
+    if (!isApiMode && (username !== 'test1234' || password !== 'test1234')) return false
 
     try {
-      window.sessionStorage.setItem(SESSION_KEY, 'active')
-      setIsLoggedIn(true)
+      const nextId = isApiMode ? await loginApi(username, password) : 'demo'
+      window.sessionStorage.setItem(isApiMode ? apiSessionKey() : SESSION_KEY, isApiMode ? nextId : 'active')
+      setUserId(nextId)
       return true
-    } catch {
+    } catch (error) {
+      if (isApiMode && error instanceof Error) throw error
       return false
     }
   }
 
   function logout() {
     try {
-      window.sessionStorage.removeItem(SESSION_KEY)
+      window.sessionStorage.removeItem(isApiMode ? apiSessionKey() : SESSION_KEY)
     } finally {
-      setIsLoggedIn(false)
+      setUserId(null)
+      if (isApiMode && userId) void logoutApi(userId).catch(() => undefined)
     }
   }
 
-  return <AuthContext.Provider value={{ isLoggedIn, login, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ isLoggedIn: userId !== null, userId, login, logout }}>{children}</AuthContext.Provider>
 }
 
 export default AuthProvider

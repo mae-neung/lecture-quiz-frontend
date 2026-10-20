@@ -6,6 +6,9 @@ import Button from '@/components/Button/Button'
 import { downloadExam, getExamFileName } from '@/features/library/exportExam'
 import { deleteSavedSet, readLibrary, renameSavedSet } from '@/features/library/libraryStorage'
 import type { SavedQuizSet } from '@/features/library/libraryStorage'
+import { useAuth } from '@/features/auth/useAuth'
+import { isApiMode } from '@/services/api'
+import { apiLibraryScope } from '@/services/apiStorage'
 
 type DialogName = 'rename' | 'delete' | 'export' | null
 
@@ -14,7 +17,9 @@ const fieldStyle = { background: 'var(--color-surface)', border: '1px solid var(
 
 function LibraryDetailContent({ id }: { id?: string }) {
   const navigate = useNavigate()
-  const [library, setLibrary] = useState(readLibrary)
+  const { userId } = useAuth()
+  const scope = isApiMode && userId ? apiLibraryScope(userId) : undefined
+  const [library, setLibrary] = useState(() => readLibrary(scope))
   const [set, setSet] = useState<SavedQuizSet | undefined>(() => library.ok ? library.value.find((item) => item.id === id) : undefined)
   const [dialogName, setDialogName] = useState<DialogName>(null)
   const [title, setTitle] = useState(set?.title ?? '')
@@ -49,17 +54,17 @@ function LibraryDetailContent({ id }: { id?: string }) {
   function rename(event: FormEvent) {
     event.preventDefault()
     if (!id) return
-    const result = renameSavedSet(id, title)
+    const result = renameSavedSet(id, title, scope)
     if (!result.ok) { setError(result.error); return }
     setSet(result.value)
-    setLibrary(readLibrary())
+    setLibrary(readLibrary(scope))
     setMessage('강의명을 변경했어요.')
     setDialogName(null)
   }
 
   function remove() {
     if (!id) return
-    const result = deleteSavedSet(id)
+    const result = deleteSavedSet(id, scope)
     if (!result.ok) { setError(result.error); return }
     setDialogName(null)
     navigate('/library', { replace: true, state: { notice: '문제 세트를 삭제했어요.' } })
@@ -77,7 +82,7 @@ function LibraryDetailContent({ id }: { id?: string }) {
       <Link style={{ color: 'var(--color-accent)', fontWeight: 800 }} to="/library">← 보관함</Link>
       <Text as="p" color="$accent" fontSize="13px" fontWeight={900} letterSpacing="0.08em" mb={0} mt="32px">SAVED QUIZ · 세트 관리</Text>
       <Text as="h1" color="$text" fontSize={["34px", "48px"]} letterSpacing="-0.05em" lineHeight={1.2} mb="12px" mt="10px" overflowWrap="anywhere">{set.title}</Text>
-      <Text as="p" color="$muted" lineHeight={1.7} m={0}>{set.materialType === 'video' ? '강의 영상' : '강의 교안'} · {set.questions.length}문제 · {new Date(set.createdAt).toLocaleDateString('ko-KR')} 등록</Text>
+      <Text as="p" color="$muted" lineHeight={1.7} m={0}>{set.materialType === 'video' ? '강의 영상' : set.materialType === 'audio' ? '강의 음성' : '강의 교안'} · {set.questions.length}문제 · {new Date(set.createdAt).toLocaleDateString('ko-KR')} 등록</Text>
       {message && <Text as="p" bg="$surfaceMuted" borderRadius="12px" color="$text" mt="20px" p="12px" role="status">{message}</Text>}
       <Grid gap="20px" gridTemplateColumns={["1fr", "minmax(0, 1.6fr) minmax(260px, 1fr)"]} mt="32px">
         <Box bg="$surface" borderColor="$border" borderRadius="20px" borderStyle="solid" borderWidth="1px" p={["22px", "28px"]}>
@@ -93,6 +98,7 @@ function LibraryDetailContent({ id }: { id?: string }) {
           <Text as="p" color="$muted" fontSize="14px" lineHeight={1.6} overflowWrap="anywhere">원본 파일명: {set.fileName}</Text>
           <Text as="p" color="$muted" fontSize="14px" lineHeight={1.6}>파일 크기: {(set.fileSize / 1024 / 1024).toFixed(2)} MB</Text>
           <Text as="p" color="$muted" fontSize="13px" lineHeight={1.6}>원본 파일 자체는 저장되지 않았어요.</Text>
+          {set.remote && <Text as="p" color="$muted" fontSize="13px" lineHeight={1.6}>이름 변경과 삭제는 현재 브라우저의 문제 세트에만 적용됩니다.</Text>}
           <Flex flexWrap="wrap" gap="8px" mt="20px">
             <Button onClick={(event) => openDialog('rename', event.currentTarget)} variant="secondary">이름 변경</Button>
             <Button onClick={(event) => openDialog('delete', event.currentTarget)} variant="danger">삭제</Button>

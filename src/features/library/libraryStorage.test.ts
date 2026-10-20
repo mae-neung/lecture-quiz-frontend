@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createSavedSet, deleteSavedSet, LIBRARY_KEY, readLibrary, renameSavedSet } from './libraryStorage'
+import { createSavedSet, deleteSavedSet, LIBRARY_KEY, libraryKey, readLibrary, renameSavedSet, saveApiSet } from './libraryStorage'
+import { apiLibraryScope } from '@/services/apiStorage'
 
 const input = { title: '통계학 1강', materialType: 'material' as const, fileName: 'lecture.pdf', fileSize: 1234 }
 
@@ -28,6 +29,19 @@ describe('libraryStorage', () => {
     expect(readLibrary()).toMatchObject({ ok: false })
     expect(createSavedSet(input)).toMatchObject({ ok: false })
     expect(window.localStorage.getItem(LIBRARY_KEY)).toBe('{broken')
+  })
+  it('API 사용자별 문제 세트를 데모와 분리한다', () => {
+    const demo = createSavedSet(input)
+    expect(demo.ok).toBe(true)
+    const scope = apiLibraryScope('user-1', 'staging')
+    const remote = saveApiSet({ ...input, materialType: 'audio', questions: demo.ok ? demo.value.questions : [], remote: { subjectId: 's1', wikiId: 'w1' } }, scope)
+    expect(remote.ok).toBe(true)
+    expect(libraryKey(scope)).toContain('api:staging:user-1')
+    expect(readLibrary(apiLibraryScope('user-2', 'staging'))).toEqual({ ok: true, value: [] })
+    expect(readLibrary(apiLibraryScope('user-1', 'production'))).toEqual({ ok: true, value: [] })
+    expect(readLibrary(scope)).toMatchObject({ ok: true, value: [{ materialType: 'audio', remote: { subjectId: 's1' } }] })
+    expect(readLibrary()).toMatchObject({ ok: true, value: [{ title: input.title }] })
+    expect(demo.ok && demo.value.remote).toBeUndefined()
   })
 
   it('구조가 잘못된 문제나 버전은 거부한다', () => {

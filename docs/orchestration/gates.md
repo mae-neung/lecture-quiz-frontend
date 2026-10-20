@@ -4,7 +4,7 @@
 
 ## Design Gate
 
-새 화면 구조·사용자 흐름·복합 상태 또는 불명확한 시각 방향이 있을 때 적용한다. 새로운 디자인 방향은 전역 Designer 승인 절차를 먼저 통과해야 한다.
+새 화면 구조·사용자 흐름·복합 상태 또는 불명확한 시각 방향이 있을 때 적용한다. 새로운 디자인 방향은 전역 Designer 승인 절차를 먼저 통과해야 한다. 이 Gate의 시각 방향과 Design Foundation은 `visual_designer`가 소유하며 일반 `designer`는 필요한 정보 구조·흐름·상태 입력을 제공하되 시안을 중복 생성하지 않는다.
 
 ### 1. Direction Preview Gate
 
@@ -53,5 +53,7 @@
 ## Verification Gate
 
 개발 중에는 영향 범위에 맞춰 `pnpm lint`, `pnpm test`, `pnpm typecheck`, `pnpm build`를 선택한다. UI·사용자 흐름 변경은 [UI 수동 점검표](ui-smoke-checklist.md)의 `scoped` 또는 `full` 수준을 추가한다.
+
+승인된 시각 방향, Design Foundation, 공용 UI 기반 또는 주요 화면 스타일을 구현한 변경은 Implementer가 실행 중인 preview URL 또는 검토 가능한 빌드 산출물과 대상 상태를 Handoff한다. `visual_reviewer`는 이를 `$visual-design`의 rubric에 따라 대표 데스크톱·모바일 폭에서 검토한다. 렌더링하지 못한 상태는 `not-run`으로 기록하며 코드 검토만으로 시각 품질을 통과 처리하지 않는다.
 
 PR 생성·업로드 또는 최종 반영 전에는 프로젝트 `AGENTS.md`의 전체 PR Gate와 UI 변경 범위에 맞는 수동 점검을 수행한다.

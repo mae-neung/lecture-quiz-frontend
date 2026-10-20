@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/features/auth/useAuth'
+import { isApiMode } from '@/services/api'
 import './Home.css'
 
 function Home() {
@@ -13,10 +14,10 @@ function Home() {
           <h1>강의 하나 넣으면,<br /><span>시험 대비 문제가 한눈에.</span></h1>
           <p className="home__lead">밀린 강의 영상과 쌓인 교안을 올려 보세요. 아맞다시험이 복습할 내용을 문제로 정리하는 학습 흐름을 준비하고 있어요.</p>
           <Link className="home__link" to={isLoggedIn ? '/upload' : '/login'}>
-            {isLoggedIn ? '강의 자료 등록하기' : '데모로 먼저 써보기'}
+            {isLoggedIn ? '강의 자료 등록하기' : isApiMode ? '로그인하고 시작하기' : '데모로 먼저 써보기'}
             <span aria-hidden="true">→</span>
           </Link>
-          <p className="home__notice">데모에서는 로그인, 자료 등록과 목업 문제 풀이를 체험할 수 있으며 실제 파일과 풀이 기록은 저장되지 않습니다.</p>
+          <p className="home__notice">{isApiMode ? '업로드한 원본 파일은 서버로 전송됩니다.' : '데모에서는 로그인, 자료 등록과 목업 문제 풀이를 체험할 수 있으며 실제 파일과 풀이 기록은 저장되지 않습니다.'}</p>
         </div>
         <div className="home__planner" aria-label="아맞다시험 학습 플래너 예시">
           <div className="home__planner-binding" aria-hidden="true"><i /><i /><i /><i /></div>
@@ -45,13 +46,13 @@ function Home() {
         <ol className="home__steps">
           <li>
             <span className="home__step-number">01</span>
-            <div><strong>강의 자료 등록</strong><p>영상이나 PDF·PPT 교안을 선택해요.</p></div>
+            <div><strong>강의 자료 등록</strong><p>{isApiMode ? 'MP4 영상, MP3 음성 또는 PDF 교안을 선택해요.' : '영상이나 PDF·PPT 교안을 선택해요.'}</p></div>
             <span className="home__step-state">지금 체험 가능</span>
           </li>
           <li>
             <span className="home__step-number">02</span>
             <div><strong>문제로 연습하기</strong><p>생성된 문제를 풀며 시험 범위를 점검해요.</p></div>
-            <Link className="home__step-state" to="/quiz">지금 체험 가능</Link>
+            <Link className="home__step-state" to={isApiMode ? '/library' : '/quiz'}>지금 체험 가능</Link>
           </li>
         </ol>
       </section>

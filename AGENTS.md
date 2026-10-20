@@ -10,6 +10,10 @@ React 19, TypeScript 5, Vite 8, React Router, pnpm 10, Node.js 24.15.0 이상, O
 
 프론트엔드 구현은 `light_frontend`, `frontend`, `frontend_high` 중 위험과 영향 범위에 맞는 profile을 사용한다. 새 화면 구조·사용자 흐름·복합 상태는 Designer를 거치며, 세부 선택 기준은 `docs/orchestration/model-routing.md`를 따른다.
 
+새 시각 방향을 만들거나 사용자가 화면이 평범함·딱딱함·시각적 완성도 부족을 이유로 개선을 요청하면 `visual_designer`와 `$visual-design`을 사용한다. 이때 `visual_designer`가 시각 방향과 Design Foundation Gate의 도메인 Designer이며, 일반 `designer`는 필요한 정보 구조·사용자 흐름·상태·UX 문구 입력을 제공하되 3안과 foundation을 중복 생성하지 않는다.
+
+승인된 시각 방향·Design Foundation·공용 UI 기반 또는 주요 화면 스타일을 구현한 뒤에는 Implementer가 실행 중인 preview URL 또는 검토 가능한 빌드 산출물과 확인할 상태를 Handoff하고, `visual_reviewer`가 실제 렌더링을 데스크톱과 모바일에서 검토한다. 코드만 확인한 결과를 시각 품질 통과로 보고하지 않는다.
+
 새 디자인의 순서는 `대표 페이지 1개로 3안 비교 → 사용자 방향 선택 → 선택안의 Design Foundation 명세·승인 → 선택된 대표 페이지 확정 → 나머지 페이지 후속 작업`으로 고정한다. 3안 비교와 foundation 승인 단계에서는 다른 페이지를 작업하지 않는다.
 
 ## 코드 규칙

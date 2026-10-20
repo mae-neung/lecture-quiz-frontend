@@ -3,6 +3,9 @@ import { useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { readLibrary } from '@/features/library/libraryStorage'
 import type { SavedQuizSet } from '@/features/library/libraryStorage'
+import { useAuth } from '@/features/auth/useAuth'
+import { isApiMode } from '@/services/api'
+import { apiLibraryScope } from '@/services/apiStorage'
 
 const fieldStyle = { background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 12, color: 'var(--color-text)', font: 'inherit', minHeight: 44, padding: '10px 14px', width: '100%' }
 const linkStyle = { color: 'var(--color-accent)', fontWeight: 800, textDecorationThickness: '2px', textUnderlineOffset: '4px' }
@@ -12,7 +15,8 @@ function formatDate(value: string) {
 }
 
 function Library() {
-  const [library] = useState(readLibrary)
+  const { userId } = useAuth()
+  const [library] = useState(() => readLibrary(isApiMode && userId ? apiLibraryScope(userId) : undefined))
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<'recent' | 'name'>('recent')
   const location = useLocation()
@@ -45,7 +49,7 @@ function Library() {
         <Box bg="$surface" borderColor="$border" borderRadius="20px" borderStyle="solid" borderWidth="1px" mt="36px" p={["26px", "40px"]}>
           <Text as="p" color="$accent" fontSize="14px" fontWeight={900} m={0}>아직 첫 세트가 없어요</Text>
           <Text as="h2" color="$text" fontSize="28px" letterSpacing="-0.04em" mb="10px" mt="12px">강의 자료 하나부터 시작해 볼까요?</Text>
-          <Text as="p" color="$muted" lineHeight={1.7}>등록하면 5개의 예시 문제가 이 브라우저에 저장돼요.</Text>
+          <Text as="p" color="$muted" lineHeight={1.7}>등록하면 5개의 {isApiMode ? '생성된' : '예시'} 문제가 이 브라우저에 저장돼요.</Text>
           <Link style={linkStyle} to="/upload">자료 등록하기</Link>
         </Box>
       ) : (
@@ -72,7 +76,7 @@ function Library() {
             <Grid as="ul" gap="14px" gridTemplateColumns={["1fr", "repeat(2, minmax(0, 1fr))"]} listStyleType="none" m={0} mt="18px" p={0}>
               {filtered.map((set: SavedQuizSet) => (
                 <Box as="li" bg="$surface" borderColor="$border" borderRadius="18px" borderStyle="solid" borderWidth="1px" key={set.id} minW={0} p="24px">
-                  <Text as="p" color="$accent" fontSize="13px" fontWeight={900} m={0}>{set.materialType === 'video' ? '강의 영상' : '강의 교안'} · {formatDate(set.createdAt)}</Text>
+                  <Text as="p" color="$accent" fontSize="13px" fontWeight={900} m={0}>{set.materialType === 'video' ? '강의 영상' : set.materialType === 'audio' ? '강의 음성' : '강의 교안'} · {formatDate(set.createdAt)}</Text>
                   <Text as="h2" color="$text" fontSize="22px" letterSpacing="-0.03em" lineHeight={1.4} mb="10px" mt="10px" overflowWrap="anywhere"><Link style={{ color: 'inherit' }} to={`/library/${set.id}`}>{set.title}</Link></Text>
                   <Text as="p" color="$muted" fontSize="14px" lineHeight={1.6} m={0} overflowWrap="anywhere">{set.fileName} · {set.questions.length}문제</Text>
                   <Flex flexWrap="wrap" gap="18px" mt="24px">

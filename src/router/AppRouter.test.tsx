@@ -109,4 +109,11 @@ describe('AppRouter', () => {
     expect(screen.getByRole('heading', { name: '페이지를 찾을 수 없습니다.' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '홈으로 돌아가기' })).toHaveAttribute('href', '#/')
   })
+
+  it('데모 모드의 회원가입 경로는 로그인으로 안전하게 이동한다', () => {
+    openAt('/signup')
+    expect(window.location.hash).toBe('#/login')
+    expect(screen.queryByRole('link', { name: '계정 만들기' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '내 과목' })).not.toBeInTheDocument()
+  })
 })

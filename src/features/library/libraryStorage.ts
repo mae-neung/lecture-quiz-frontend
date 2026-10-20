@@ -13,6 +13,7 @@ export type SavedQuizSet = {
   createdAt: string
   updatedAt: string
   questions: QuizQuestion[]
+  remote?: { subjectId: string; wikiId: string }
 }
 
 type LibraryData = { version: 1; sets: SavedQuizSet[] }
@@ -40,7 +41,8 @@ function isSavedSet(value: unknown): value is SavedQuizSet {
   if (!isObject(value)) return false
   return typeof value.id === 'string' && /^[A-Za-z0-9_-]+$/.test(value.id) &&
     typeof value.title === 'string' && value.title.trim().length > 0 &&
-    (value.materialType === 'video' || value.materialType === 'material') &&
+    (value.materialType === 'video' || value.materialType === 'material' || value.materialType === 'audio') &&
+    (value.remote === undefined || (isObject(value.remote) && typeof value.remote.subjectId === 'string' && typeof value.remote.wikiId === 'string')) &&
     typeof value.fileName === 'string' && typeof value.fileSize === 'number' && Number.isFinite(value.fileSize) && value.fileSize >= 0 &&
     typeof value.createdAt === 'string' && !Number.isNaN(Date.parse(value.createdAt)) &&
     typeof value.updatedAt === 'string' && !Number.isNaN(Date.parse(value.updatedAt)) &&
@@ -53,9 +55,11 @@ function isLibraryData(value: unknown): value is LibraryData {
     value.sets.every(isSavedSet) && new Set(value.sets.map((set) => set.id)).size === value.sets.length
 }
 
-function writeLibrary(sets: SavedQuizSet[]): LibraryResult<SavedQuizSet[]> {
+export function libraryKey(scope?: string): string { return scope ? `${LIBRARY_KEY}.api:${scope}` : LIBRARY_KEY }
+
+function writeLibrary(sets: SavedQuizSet[], scope?: string): LibraryResult<SavedQuizSet[]> {
   try {
-    window.localStorage.setItem(LIBRARY_KEY, JSON.stringify({ version: 1, sets }))
+    window.localStorage.setItem(libraryKey(scope), JSON.stringify({ version: 1, sets }))
     window.dispatchEvent(new Event('quiz-library-change'))
     return { ok: true, value: sets }
   } catch (error) {
@@ -64,9 +68,9 @@ function writeLibrary(sets: SavedQuizSet[]): LibraryResult<SavedQuizSet[]> {
   }
 }
 
-export function readLibrary(): LibraryResult<SavedQuizSet[]> {
+export function readLibrary(scope?: string): LibraryResult<SavedQuizSet[]> {
   try {
-    const raw = window.localStorage.getItem(LIBRARY_KEY)
+    const raw = window.localStorage.getItem(libraryKey(scope))
     if (raw === null) return { ok: true, value: [] }
     const parsed: unknown = JSON.parse(raw)
     return isLibraryData(parsed) ? { ok: true, value: parsed.sets } : { ok: false, error: invalidData }
@@ -85,22 +89,32 @@ export function createSavedSet(input: Pick<SavedQuizSet, 'title' | 'materialType
   return written.ok ? { ok: true, value: set } : written
 }
 
-export function renameSavedSet(id: string, title: string): LibraryResult<SavedQuizSet> {
-  const existing = readLibrary()
+export function saveApiSet(input: Pick<SavedQuizSet, 'title' | 'materialType' | 'fileName' | 'fileSize' | 'questions' | 'remote'>, scope: string): LibraryResult<SavedQuizSet> {
+  const existing = readLibrary(scope)
+  if (!existing.ok) return existing
+  const now = new Date().toISOString()
+  const id = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  const set: SavedQuizSet = { ...input, id, createdAt: now, updatedAt: now }
+  const written = writeLibrary([set, ...existing.value], scope)
+  return written.ok ? { ok: true, value: set } : written
+}
+
+export function renameSavedSet(id: string, title: string, scope?: string): LibraryResult<SavedQuizSet> {
+  const existing = readLibrary(scope)
   if (!existing.ok) return existing
   const set = existing.value.find((item) => item.id === id)
   if (!set) return { ok: false, error: '해당 문제 세트를 찾을 수 없어요.' }
   const trimmed = title.trim()
   if (!trimmed) return { ok: false, error: '강의명을 입력해 주세요.' }
   const updated = { ...set, title: trimmed, updatedAt: new Date().toISOString() }
-  const written = writeLibrary(existing.value.map((item) => item.id === id ? updated : item))
+  const written = writeLibrary(existing.value.map((item) => item.id === id ? updated : item), scope)
   return written.ok ? { ok: true, value: updated } : written
 }
 
-export function deleteSavedSet(id: string): LibraryResult<null> {
-  const existing = readLibrary()
+export function deleteSavedSet(id: string, scope?: string): LibraryResult<null> {
+  const existing = readLibrary(scope)
   if (!existing.ok) return existing
   if (!existing.value.some((item) => item.id === id)) return { ok: false, error: '해당 문제 세트를 찾을 수 없어요.' }
-  const written = writeLibrary(existing.value.filter((item) => item.id !== id))
+  const written = writeLibrary(existing.value.filter((item) => item.id !== id), scope)
   return written.ok ? { ok: true, value: null } : written
 }

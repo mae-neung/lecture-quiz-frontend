@@ -6,10 +6,14 @@ import { readLibrary } from '@/features/library/libraryStorage'
 import { mockQuizQuestions } from '@/features/quiz/mockQuestions'
 import { getCorrectCount, getFirstUnansweredIndex, getQuizScore } from '@/features/quiz/scoreQuiz'
 import type { QuizAnswers } from '@/features/quiz/types'
+import { useAuth } from '@/features/auth/useAuth'
+import { isApiMode } from '@/services/api'
+import { apiLibraryScope } from '@/services/apiStorage'
 
 function QuizContent({ id }: { id?: string }) {
   const navigate = useNavigate()
-  const savedLibrary = id ? readLibrary() : null
+  const { userId } = useAuth()
+  const savedLibrary = id ? readLibrary(isApiMode && userId ? apiLibraryScope(userId) : undefined) : null
   const savedSet = savedLibrary?.ok ? savedLibrary.value.find((set) => set.id === id) : undefined
   const questions = savedSet?.questions ?? mockQuizQuestions
   const [answers, setAnswers] = useState<QuizAnswers>({})
@@ -58,6 +62,14 @@ function QuizContent({ id }: { id?: string }) {
     requestAnimationFrame(() => questionHeading.current?.focus())
   }
 
+  if (isApiMode && !id) return (
+    <Box as="section" maxW="960px" mx="auto" px="20px" py="56px">
+      <Text as="h1" color="$text">보관함에서 문제 세트를 선택해 주세요</Text>
+      <Text as="p" color="$muted">API로 생성한 문제는 보관함에서 다시 풀 수 있어요.</Text>
+      <Link to="/library">보관함으로 가기</Link>
+    </Box>
+  )
+
   if (id && (!savedLibrary?.ok || !savedSet)) return (
     <Box as="section" maxW="960px" mx="auto" px="20px" py="56px">
       <Text as="h1" color="$text">문제 세트를 열 수 없어요</Text>
@@ -72,9 +84,9 @@ function QuizContent({ id }: { id?: string }) {
 
     return (
       <Box as="section" maxW="1000px" mx="auto" px={["16px", "24px"]} py={["40px", "64px"]}>
-        <Text as="p" color="$accent" fontSize="13px" fontWeight={900} letterSpacing="0.08em" m={0}>채점 완료 · MOCK QUIZ</Text>
+        <Text as="p" color="$accent" fontSize="13px" fontWeight={900} letterSpacing="0.08em" m={0}>채점 완료 · {savedSet?.remote ? 'API QUIZ' : 'MOCK QUIZ'}</Text>
         <Text as="h1" color="$text" fontSize={["36px", "52px"]} letterSpacing="-0.055em" lineHeight={1.15} mb="12px" mt="12px" ref={resultHeading} tabIndex={-1}>오늘의 복습 결과예요.</Text>
-        <Text as="p" color="$muted" lineHeight={1.7} m={0}>목업 문제로 확인한 결과이며, 페이지를 새로고침하면 풀이 기록이 초기화돼요.</Text>
+        <Text as="p" color="$muted" lineHeight={1.7} m={0}>{savedSet?.remote ? '서버에서 생성한 문제로 확인한 결과입니다.' : '목업 문제로 확인한 결과이며,'} 페이지를 새로고침하면 풀이 기록이 초기화돼요.</Text>
 
         <Grid aria-live="polite" bg="$accent" borderRadius="22px" color="$onAccent" gap="12px" gridTemplateColumns={["1fr", "1.4fr 1fr"]} mt="36px" p={["24px", "36px"]}>
           <Box>
@@ -125,7 +137,7 @@ function QuizContent({ id }: { id?: string }) {
     <Box as="section" maxW="1000px" mx="auto" px={["16px", "24px"]} py={["40px", "64px"]}>
       <Text as="p" color="$accent" fontSize="13px" fontWeight={900} letterSpacing="0.08em" m={0}>STEP 02 · 문제 풀이</Text>
       <Text as="h1" color="$text" fontSize={["36px", "52px"]} letterSpacing="-0.055em" lineHeight={1.15} mb="12px" mt="12px">{savedSet ? `${savedSet.title} 문제 풀기` : '핵심 개념을 문제로 확인해요.'}</Text>
-      <Text as="p" color="$muted" lineHeight={1.7} m={0}>{questions.length}개의 목업 문제입니다. 답안은 이동해도 유지되지만 새로고침하면 초기화돼요.</Text>
+      <Text as="p" color="$muted" lineHeight={1.7} m={0}>{questions.length}개의 {savedSet?.remote ? '서버 생성' : '목업'} 문제입니다. 답안은 이동해도 유지되지만 새로고침하면 초기화돼요.</Text>
 
       <Grid alignItems="start" gap="20px" gridTemplateColumns={["1fr", "220px minmax(0, 1fr)"]} mt="36px">
         <Box as="aside" bg="$surfaceMuted" borderColor="$border" borderRadius="18px" borderStyle="solid" borderWidth="1px" p="20px">
