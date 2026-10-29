@@ -20,6 +20,7 @@ function AppLayout() {
           <NavLink to={isApiMode ? '/library' : '/quiz'}>문제 풀이</NavLink>
           <NavLink to="/library">내 보관함</NavLink>
           {isApiMode && <NavLink to="/subjects">내 과목</NavLink>}
+          {isApiMode && <NavLink to="/account">계정 관리</NavLink>}
           {isLoggedIn ? <Button variant="secondary" onClick={logout}>로그아웃</Button> : <NavLink to="/login">로그인</NavLink>}
         </nav>
       </header>

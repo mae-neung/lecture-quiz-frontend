@@ -16,7 +16,7 @@ function Login() {
   const [isPending, setPending] = useState(false)
   const state: unknown = location.state
   const from = typeof state === 'object' && state !== null && 'from' in state &&
-    typeof state.from === 'string' && /^\/(?:upload|subjects|quiz(?:\/[A-Za-z0-9_-]+)?|library(?:\/[A-Za-z0-9_-]+)?)(?:[?#]|$)/.test(state.from)
+    typeof state.from === 'string' && /^\/(?:upload|account|subjects(?:\/[A-Za-z0-9_-]+(?:\/wiki\/[A-Za-z0-9_-]+)?)?|quiz(?:\/[A-Za-z0-9_-]+)?|library(?:\/[A-Za-z0-9_-]+)?)(?:[?#]|$)/.test(state.from)
     ? state.from
     : '/upload'
 
@@ -78,6 +78,7 @@ function Login() {
           />
         </div>
         {error && <p className="form-error" id="login-error" role="alert">{error}</p>}
+        {typeof state === 'object' && state !== null && 'notice' in state && typeof state.notice === 'string' && <p role="status">{state.notice}</p>}
         {isApiMode && isPending && <p role="status" aria-live="polite">서버에 로그인 요청 중입니다.</p>}
         <Button type="submit" className="login-card__submit" disabled={isPending}>{isPending ? '로그인 중…' : '로그인하고 시작하기'}</Button>
         {isApiMode && <p className="login-card__note">아직 계정이 없나요? <Link to="/signup">계정 만들기</Link></p>}

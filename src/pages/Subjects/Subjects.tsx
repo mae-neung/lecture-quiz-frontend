@@ -1,11 +1,13 @@
 import { Box, Flex, Grid, Text } from '@devup-ui/react'
 import { useEffect, useRef } from 'react'
 import type { FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import Button from '@/components/Button/Button'
 import { useAuth } from '@/features/auth/useAuth'
 import { useSubjects } from '@/features/subjects/useSubjects'
 
 const fieldStyle = { background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 12, color: 'var(--color-text)', font: 'inherit', minHeight: 44, padding: '10px 14px', width: '100%' }
+const linkStyle = { color: 'var(--color-accent)', fontWeight: 800 }
 
 function Subjects() {
   const { userId } = useAuth()
@@ -79,6 +81,7 @@ function Subjects() {
       {!isLoading && !loadError && subjects.length > 0 && <Grid as="ul" gap="14px" gridTemplateColumns={["1fr", "repeat(2, minmax(0, 1fr))"]} listStyleType="none" m={0} mt="20px" p={0}>
         {subjects.map((subject) => <Box as="li" bg="$surface" borderColor="$border" borderRadius="18px" borderStyle="solid" borderWidth="1px" key={subject.subjectId} minW={0} p="24px">
           <Text as="h3" color="$text" fontSize="22px" lineHeight={1.4} m={0} overflowWrap="anywhere" tabIndex={-1}>{subject.subjectName || '이름 없는 과목'}</Text>
+          <Link style={linkStyle} to={`/subjects/${subject.subjectId}`}>과목 상세 보기</Link>
           {editingId === subject.subjectId ? <Box as="form" mt="18px" onSubmit={(event: FormEvent<HTMLFormElement>) => submitRename(event, subject.subjectId)}>
             <label htmlFor={`subject-name-${subject.subjectId}`} style={{ display: 'block', fontWeight: 800, marginBottom: 8 }}>새 과목명</label>
             <input id={`subject-name-${subject.subjectId}`} ref={renameRef} style={fieldStyle} value={draftName} disabled={actionPending === subject.subjectId} aria-invalid={Boolean(actionError)} aria-describedby={actionError ? `subject-action-error-${subject.subjectId}` : undefined} onChange={(event) => changeDraftName(event.target.value)} />

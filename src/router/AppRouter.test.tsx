@@ -116,4 +116,11 @@ describe('AppRouter', () => {
     expect(screen.queryByRole('link', { name: '계정 만들기' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '내 과목' })).not.toBeInTheDocument()
   })
+
+  it.each(['/subjects/demo', '/subjects/demo/wiki/wiki', '/account'])('데모 모드의 API 전용 경로 %s 는 자료 등록으로 이동한다', (path) => {
+    window.sessionStorage.setItem('lecture-quiz-demo-session', 'active')
+    openAt(path)
+    expect(window.location.hash).toBe('#/upload')
+    expect(screen.queryByRole('link', { name: '계정 관리' })).not.toBeInTheDocument()
+  })
 })
