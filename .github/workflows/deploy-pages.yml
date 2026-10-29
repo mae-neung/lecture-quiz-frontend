@@ -40,6 +40,11 @@ jobs:
       - name: Verify and build
         run: pnpm verify
 
+      - name: Build Pages in API mode
+        env:
+          VITE_API_BASE_URL: http://127.0.0.1:8000
+        run: pnpm build
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 

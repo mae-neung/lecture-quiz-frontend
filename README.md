@@ -44,7 +44,7 @@ Vite는 `/api` 접두어를 제거해 백엔드에 전달합니다. 백엔드를
 
 문제 세트는 API 환경과 서버의 사용자 ID별로 이 브라우저의 localStorage에 분리 저장됩니다. API 로그인 세션도 환경별로 분리됩니다. 저장소 환경값은 `VITE_API_STORAGE_NAMESPACE`, 없으면 `VITE_API_PROXY_TARGET`, 그것도 없으면 `VITE_API_BASE_URL`입니다. 같은 `/api` 경로에서 백엔드를 바꾸는 경우 `VITE_API_STORAGE_NAMESPACE`를 환경마다 다르게 설정하세요. 원본 파일은 서버에 전송되며 브라우저에는 저장되지 않습니다. 서버 문제에는 해설이 없어 중립 안내 문구가 표시됩니다. 브라우저에 저장한 세트의 이름 변경·삭제는 로컬 세트에만 적용됩니다.
 
-`VITE_API_BASE_URL`이 비어 있으면 `test1234` 데모 흐름이 그대로 동작합니다. 공개 GitHub Pages 배포도 기본적으로 이 데모 설정을 사용합니다.
+`VITE_API_BASE_URL`이 비어 있으면 `test1234` 데모 흐름이 그대로 동작합니다. 공개 GitHub Pages는 테스트용으로 `http://127.0.0.1:8000` API 모드로 빌드되므로, 페이지를 연 컴퓨터에서 백엔드를 실행하고 Pages origin의 CORS·로컬 네트워크 접근을 허용해야 합니다.
 
 ## 검증
 
