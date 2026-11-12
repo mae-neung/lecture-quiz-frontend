@@ -10,7 +10,7 @@ function openAt(path: string) {
 }
 
 async function signIn() {
-  const user = userEvent.setup()
+  const user = userEvent.setup({ delay: null })
   await user.type(screen.getByLabelText('아이디'), 'test1234')
   await user.type(screen.getByLabelText('비밀번호'), 'test1234')
   await user.click(screen.getByRole('button', { name: '로그인하고 시작하기' }))
@@ -67,7 +67,7 @@ describe('Quiz', () => {
       } else if (question.type === 'short') {
         await user.type(screen.getByPlaceholderText('예: 중앙값'), question.correctAnswer)
       } else {
-        await user.type(screen.getByPlaceholderText(/핵심 근거/), question.correctAnswer)
+        await user.type(screen.getByPlaceholderText(/핵심 근거/), '서술형 요약 답안')
       }
       if (index < mockQuizQuestions.length - 1) {
         await user.click(screen.getByRole('button', { name: '다음 문제' }))
@@ -76,7 +76,7 @@ describe('Quiz', () => {
 
     await user.click(screen.getByRole('button', { name: '채점하기' }))
 
-    expect(screen.getByRole('heading', { name: '오늘의 복습 결과예요.' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '오늘의 복습 결과예요.' })).toBeInTheDocument()
     expect(screen.getByText('100점')).toBeInTheDocument()
     expect(screen.getByText(`${gradable} / ${gradable} 정답`)).toBeInTheDocument()
     expect(screen.getAllByText(/^내 답:/)).toHaveLength(mockQuizQuestions.length)
