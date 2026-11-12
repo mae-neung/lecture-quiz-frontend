@@ -27,14 +27,27 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+const QUESTION_TYPES = ['ox', 'select', 'short', 'long']
+
 function isQuestion(value: unknown): value is QuizQuestion {
   if (!isObject(value) || typeof value.id !== 'string' || typeof value.prompt !== 'string' ||
     typeof value.explanation !== 'string' || typeof value.correctOptionId !== 'string' ||
-    !Array.isArray(value.options) || value.options.length < 2) return false
+    !Array.isArray(value.options)) return false
+  // type이 없는 기존 저장본은 선택형(객관식)으로 간주해 하위호환을 유지한다.
+  const type = value.type === undefined ? 'select' : value.type
+  if (typeof type !== 'string' || !QUESTION_TYPES.includes(type)) return false
+  // 정답 텍스트는 선택형의 기존 저장본에는 없을 수 있어 선택적으로 허용한다.
+  if (value.correctAnswer !== undefined && typeof value.correctAnswer !== 'string') return false
   const options = value.options
-  return options.every((option) => isObject(option) && typeof option.id === 'string' && typeof option.label === 'string') &&
-    options.some((option) => option.id === value.correctOptionId) &&
+  const optionsValid = options.every((option) => isObject(option) && typeof option.id === 'string' && typeof option.label === 'string') &&
     new Set(options.map((option) => option.id)).size === options.length
+  if (!optionsValid) return false
+  if (type === 'short' || type === 'long') {
+    // 텍스트형은 보기가 없고 정답/모범답안 문자열이 필요하다.
+    return typeof value.correctAnswer === 'string' && value.correctAnswer.trim().length > 0
+  }
+  // 선택형은 보기 2개 이상과 보기에 연결된 정답이 필요하다.
+  return options.length >= 2 && options.some((option) => option.id === value.correctOptionId)
 }
 
 function isSavedSet(value: unknown): value is SavedQuizSet {

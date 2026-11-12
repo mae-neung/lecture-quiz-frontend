@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createSavedSet, deleteSavedSet, LIBRARY_KEY, libraryKey, readLibrary, renameSavedSet, saveApiSet } from './libraryStorage'
+import { mockQuizQuestions } from '@/features/quiz/mockQuestions'
 import { apiLibraryScope } from '@/services/apiStorage'
 
 const input = { title: '통계학 1강', materialType: 'material' as const, fileName: 'lecture.pdf', fileSize: 1234 }
@@ -16,7 +17,7 @@ describe('libraryStorage', () => {
     if (!created.ok) return
     expect(readLibrary()).toMatchObject({ ok: true, value: [{ id: created.value.id, title: input.title }] })
     expect(window.localStorage.getItem(LIBRARY_KEY)).not.toContain('document-content')
-    expect(created.value.questions).toHaveLength(5)
+    expect(created.value.questions).toHaveLength(mockQuizQuestions.length)
 
     const renamed = renameSavedSet(created.value.id, '통계학 중간고사')
     expect(renamed.ok && renamed.value.title).toBe('통계학 중간고사')

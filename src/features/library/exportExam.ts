@@ -11,18 +11,38 @@ export function getExamFileName(title: string): string {
 }
 
 export function buildExamHtml(set: SavedQuizSet, includeAnswers = false): string {
-  const questions = set.questions.map((question, index) => `
+  const typeLabel: Record<string, string> = { ox: 'OX', select: '객관식', short: '단답형', long: '서술형' }
+  const isChoice = (question: SavedQuizSet['questions'][number]) => question.type === undefined || question.type === 'ox' || question.type === 'select'
+  const questions = set.questions.map((question, index) => {
+    const label = typeLabel[question.type ?? 'select'] ?? '객관식'
+    const body = isChoice(question)
+      ? `<ol type="${question.type === 'ox' ? '1' : 'A'}">${question.options.map((option) => `<li>${escapeHtml(option.label)}</li>`).join('')}</ol>
+      <p class="answer-line">답: __________</p>`
+      : question.type === 'short'
+        ? '<p class="answer-line">답: ______________________________</p>'
+        : '<div class="answer-area"></div>'
+    return `
     <section class="question">
-      <h2>${index + 1}. ${escapeHtml(question.prompt)}</h2>
-      <ol type="A">${question.options.map((option) => `<li>${escapeHtml(option.label)}</li>`).join('')}</ol>
-      <p class="answer-line">답: __________</p>
-    </section>`).join('')
+      <h2><span class="tag">${label}</span> ${index + 1}. ${escapeHtml(question.prompt)}</h2>
+      ${body}
+    </section>`
+  }).join('')
   const answerSheet = includeAnswers ? `
     <section class="answer-sheet">
       <h2>정답 및 해설</h2>
       ${set.questions.map((question, index) => {
-        const optionIndex = question.options.findIndex((option) => option.id === question.correctOptionId)
-        return `<article><h3>${index + 1}번 · ${String.fromCharCode(65 + optionIndex)}</h3><p>${escapeHtml(question.explanation)}</p></article>`
+        let answerText: string
+        if (isChoice(question)) {
+          const optionIndex = question.options.findIndex((option) => option.id === question.correctOptionId)
+          const marker = question.type === 'ox'
+            ? (question.options[optionIndex]?.label ?? '')
+            : (optionIndex >= 0 ? String.fromCharCode(65 + optionIndex) : '')
+          answerText = escapeHtml(marker)
+        } else {
+          answerText = escapeHtml(question.correctAnswer ?? '')
+        }
+        const prefix = question.type === 'long' ? '모범답안' : '정답'
+        return `<article><h3>${index + 1}번 · ${prefix}: ${answerText}</h3><p>${escapeHtml(question.explanation)}</p></article>`
       }).join('')}
     </section>` : ''
   return `<!doctype html>
@@ -32,6 +52,7 @@ export function buildExamHtml(set: SavedQuizSet, includeAnswers = false): string
   *{box-sizing:border-box}body{font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;color:#28263f;max-width:850px;margin:0 auto;padding:40px 32px;line-height:1.65}
   header{border-bottom:3px solid #4b4696;padding-bottom:18px;margin-bottom:32px}h1{font-size:28px;margin:0 0 8px}header p{margin:0;color:#67627a}.student{margin-top:20px}
   .question{break-inside:avoid;margin:0 0 28px;padding:18px 0;border-bottom:1px solid #dcd7e7}.question h2{font-size:19px;margin:0 0 12px}.question ol{margin:0;padding-left:30px}.question li{padding:4px 0}.answer-line{margin:16px 0 0}
+  .tag{display:inline-block;font-size:12px;font-weight:700;color:#4b4696;background:#ece9f8;border-radius:999px;padding:2px 9px;margin-right:8px;vertical-align:middle}.answer-area{margin:14px 0 0;border:1px solid #cfc9e0;border-radius:8px;height:120px}
   .answer-sheet{break-before:page;margin-top:48px;border-top:3px solid #4b4696;padding-top:20px}.answer-sheet h2{font-size:24px}.answer-sheet article{break-inside:avoid;margin:20px 0}.answer-sheet h3{font-size:17px;margin:0}.answer-sheet p{margin:5px 0}
   @media print{body{max-width:none;padding:0}@page{size:A4;margin:18mm}}
 </style></head><body>

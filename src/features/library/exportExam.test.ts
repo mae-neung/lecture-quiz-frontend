@@ -15,7 +15,7 @@ describe('exportExam', () => {
     expect(html).not.toContain('<script>')
     expect(html).not.toContain('정답 및 해설')
     expect(html).not.toContain(mockQuizQuestions[0].explanation)
-    expect(html).toContain('총 5문제')
+    expect(html).toContain(`총 ${mockQuizQuestions.length}문제`)
   })
 
   it('요청할 때만 별도 정답 섹션에 정답과 해설을 포함한다', () => {

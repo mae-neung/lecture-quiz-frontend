@@ -48,21 +48,27 @@ describe('Quiz', () => {
 
     await user.click(screen.getByRole('button', { name: '채점하기' }))
     const unansweredHeading = screen.getByRole('heading', { name: secondQuestion.prompt })
-    expect(screen.getByRole('alert')).toHaveTextContent('2번 문제부터 답을 선택해 주세요.')
+    expect(screen.getByRole('alert')).toHaveTextContent('2번 문제부터 답을 입력해 주세요.')
     await waitFor(() => expect(unansweredHeading).toHaveFocus())
   })
 
-  it('모든 답을 채점해 점수·정답·해설을 보여주고 다시 풀 수 있다', async () => {
+  it('객관식·OX·단답형·서술형을 유형별로 입력해 채점하고 다시 풀 수 있다', async () => {
     openAt('/quiz')
     const user = await signIn()
 
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const gradable = mockQuizQuestions.filter((question) => question.type !== 'long').length
+
     for (const [index, question] of mockQuizQuestions.entries()) {
-      const optionId = index === mockQuizQuestions.length - 1
-        ? question.options.find((option) => option.id !== question.correctOptionId)?.id
-        : question.correctOptionId
-      const option = question.options.find((item) => item.id === optionId)
-      if (!option) throw new Error('테스트 답안을 찾을 수 없습니다.')
-      await user.click(screen.getByRole('radio', { name: new RegExp(option.label) }))
+      if (question.type === 'ox' || question.type === 'select') {
+        const correct = question.options.find((option) => option.id === question.correctOptionId)
+        if (!correct) throw new Error('테스트 답안을 찾을 수 없습니다.')
+        await user.click(screen.getByRole('radio', { name: new RegExp(escapeRegExp(correct.label)) }))
+      } else if (question.type === 'short') {
+        await user.type(screen.getByPlaceholderText('예: 중앙값'), question.correctAnswer)
+      } else {
+        await user.type(screen.getByPlaceholderText(/핵심 근거/), question.correctAnswer)
+      }
       if (index < mockQuizQuestions.length - 1) {
         await user.click(screen.getByRole('button', { name: '다음 문제' }))
       }
@@ -71,14 +77,16 @@ describe('Quiz', () => {
     await user.click(screen.getByRole('button', { name: '채점하기' }))
 
     expect(screen.getByRole('heading', { name: '오늘의 복습 결과예요.' })).toBeInTheDocument()
-    expect(screen.getByText('80점')).toBeInTheDocument()
-    expect(screen.getByText('4 / 5 정답')).toBeInTheDocument()
-    expect(screen.getAllByText(/^내 답:/)).toHaveLength(5)
-    expect(screen.getAllByText(/^정답:/)).toHaveLength(5)
-    expect(screen.getAllByText(/^해설:/)).toHaveLength(5)
+    expect(screen.getByText('100점')).toBeInTheDocument()
+    expect(screen.getByText(`${gradable} / ${gradable} 정답`)).toBeInTheDocument()
+    expect(screen.getAllByText(/^내 답:/)).toHaveLength(mockQuizQuestions.length)
+    expect(screen.getAllByText(/^해설:/)).toHaveLength(mockQuizQuestions.length)
+    // 서술형 1개는 '모범답안:'으로, 나머지는 '정답:'으로 표기한다.
+    expect(screen.getAllByText(/^정답:/)).toHaveLength(gradable)
+    expect(screen.getAllByText(/^모범답안:/)).toHaveLength(mockQuizQuestions.length - gradable)
 
     await user.click(screen.getByRole('button', { name: '다시 풀기' }))
     expect(screen.getByRole('heading', { name: mockQuizQuestions[0].prompt })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: new RegExp(mockQuizQuestions[0].options[0].label) })).not.toBeChecked()
+    expect(screen.getByRole('radio', { name: new RegExp(escapeRegExp(mockQuizQuestions[0].options[0].label)) })).not.toBeChecked()
   })
 })
