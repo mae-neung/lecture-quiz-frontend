@@ -17,7 +17,6 @@ function AppLayout() {
         <nav aria-label="주요 메뉴">
           <NavLink end to="/">홈</NavLink>
           <NavLink to="/upload">자료 등록</NavLink>
-          <NavLink to="/library">내 보관함</NavLink>
           {isApiMode && <NavLink to="/subjects">내 과목</NavLink>}
           {isApiMode && <NavLink to="/account">계정 관리</NavLink>}
           {isLoggedIn ? <Button variant="secondary" onClick={logout}>로그아웃</Button> : <NavLink to="/login">로그인</NavLink>}

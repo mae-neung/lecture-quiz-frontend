@@ -52,7 +52,7 @@ function Home() {
           <li>
             <span className="home__step-number">02</span>
             <div><strong>문제로 연습하기</strong><p>생성된 문제를 풀며 시험 범위를 점검해요.</p></div>
-            <Link className="home__step-state" to={isApiMode ? '/library' : '/quiz'}>지금 체험 가능</Link>
+            <Link className="home__step-state" to={isApiMode ? '/subjects' : '/quiz'}>지금 체험 가능</Link>
           </li>
         </ol>
       </section>

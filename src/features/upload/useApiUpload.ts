@@ -1,20 +1,16 @@
 import { useRef, useState } from 'react'
 import { createSubject, createProblems, firstWikiId, getProblems, summarizeLecture, updateSubject, uploadLecture } from '@/services/api'
 import { mapApiProblems } from './mapApiProblems'
-import { saveApiSet } from '@/features/library/libraryStorage'
-import { apiLibraryScope } from '@/services/apiStorage'
 import type { LectureType } from './validateLecture'
-import type { SavedQuizSet } from '@/features/library/libraryStorage'
-import type { QuizQuestion } from '@/features/quiz/types'
 
-type Stage = 'subject' | 'rename' | 'upload' | 'summary' | 'wiki' | 'generate' | 'problems' | 'save'
-type Checkpoint = { key: string; subjectId?: string; wikiId?: string; questions?: QuizQuestion[]; next: Stage | 'blocked' }
+type Stage = 'subject' | 'rename' | 'upload' | 'summary' | 'wiki' | 'generate' | 'problems'
+type Checkpoint = { key: string; subjectId?: string; wikiId?: string; next: Stage | 'blocked' }
 
 const unsafeToRetry = new Set<Stage>(['subject', 'upload', 'summary', 'generate'])
 
 const stageMessage: Record<Stage, string> = {
   subject: '과목 생성 중', rename: '강의명 설정 중', upload: '파일 업로드 중', summary: '자료 요약 중',
-  wiki: '요약 문서 확인 중', generate: '문제 생성 중', problems: '문제 확인 중', save: '보관함 저장 중',
+  wiki: '요약 문서 확인 중', generate: '문제 생성 중', problems: '문제 확인 중',
 }
 
 export function useApiUpload(userId: string | null) {
@@ -32,7 +28,7 @@ export function useApiUpload(userId: string | null) {
     setError('')
   }
 
-  async function submit(title: string, type: LectureType, file: File): Promise<SavedQuizSet | null> {
+  async function submit(title: string, type: LectureType, file: File): Promise<{ subjectId: string } | null> {
     if (busy.current) return null
     if (!userId) { setError('로그인이 필요합니다. 다시 로그인해 주세요.'); return null }
     if (checkpoint.current?.next === 'blocked') return null
@@ -63,15 +59,11 @@ export function useApiUpload(userId: string | null) {
       const wikiId = state.wikiId
       if (!wikiId) throw new Error('요약 문서 결과가 없습니다.')
       if (state.next === 'generate') { setProgress(stageMessage.generate); await createProblems(userId, subjectId, wikiId); state.next = 'problems' }
-      if (state.next === 'problems') { setProgress(stageMessage.problems); state.questions = mapApiProblems(await getProblems(userId, subjectId, wikiId)); state.next = 'save' }
-      if (!state.questions) throw new Error('문제 조회 결과가 없습니다.')
-      setProgress(stageMessage.save)
-      const result = saveApiSet({ title, materialType: type, fileName: file.name, fileSize: file.size, questions: state.questions, remote: { subjectId, wikiId } }, apiLibraryScope(userId))
-      if (!result.ok) throw new Error(result.error)
+      if (state.next === 'problems') { setProgress(stageMessage.problems); mapApiProblems(await getProblems(userId, subjectId, wikiId)) }
       checkpoint.current = null
       setCheckpointStatus('none')
-      setProgress('문제 세트 저장 완료')
-      return result.value
+      setProgress('문제 생성 완료')
+      return { subjectId }
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : '요청에 실패했습니다.'
       const failedStage = state.next
