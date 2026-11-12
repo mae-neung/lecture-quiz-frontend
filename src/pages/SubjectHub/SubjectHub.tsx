@@ -1,4 +1,4 @@
-import { Box, Grid, Text } from '@devup-ui/react'
+import { Box, Flex, Grid, Text } from '@devup-ui/react'
 import { useRef } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { useSubjectHub } from '@/features/subjectHub/useSubjectHub'
 
 const fieldStyle = { background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 12, color: 'var(--color-text)', font: 'inherit', minHeight: 110, padding: '12px 14px', width: '100%' }
 const linkStyle = { color: 'var(--color-accent)', fontWeight: 800 }
+const quizButtonStyle = { alignItems: 'center', background: 'var(--color-accent)', borderRadius: 12, color: 'var(--color-onAccent)', display: 'inline-flex', fontWeight: 800, minHeight: 40, padding: '0 18px' }
 
 function activity(value: boolean | null, active: string): string {
   if (value === null) return '확인할 문서 없음'
@@ -65,7 +66,10 @@ function SubjectHub() {
           {model.documents.map((document, index) => <Box as="li" bg="$surface" borderColor="$border" borderRadius="18px" borderStyle="solid" borderWidth="1px" key={document.wiki_document_id} minW={0} p="22px">
             <Text as="h3" color="$text" fontSize="20px" m={0}>요약 문서 {index + 1}</Text>
             <Text as="p" color="$muted" fontSize="14px" lineHeight={1.7} mt="12px" overflowWrap="anywhere" whiteSpace="pre-wrap">{document.wiki_document_content.slice(0, 180) || '본문이 비어 있습니다.'}{document.wiki_document_content.length > 180 ? '…' : ''}</Text>
-            <Link style={linkStyle} to={`/subjects/${subjectId}/wiki/${document.wiki_document_id}`}>문서와 문제 보기</Link>
+            <Flex alignItems="center" flexWrap="wrap" gap="14px" mt="18px">
+              <Link style={quizButtonStyle} to={`/subjects/${subjectId}/wiki/${document.wiki_document_id}`}>문제 풀이</Link>
+              <Link style={linkStyle} to={`/subjects/${subjectId}/wiki/${document.wiki_document_id}`}>문서와 문제 보기</Link>
+            </Flex>
           </Box>)}
         </Grid>}
       </Box></>}

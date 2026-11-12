@@ -50,6 +50,7 @@ describe('SubjectHub', () => {
     expect(await screen.findByRole('heading', { name: '통계학' })).toBeInTheDocument()
     expect(screen.getAllByText(/완료 여부는/).length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: '문서와 문제 보기' })).toHaveAttribute('href', '/subjects/s1/wiki/w1')
+    expect(screen.getByRole('link', { name: '문제 풀이' })).toHaveAttribute('href', '/subjects/s1/wiki/w1')
     await user.type(screen.getByLabelText('자료 URL'), 'https://example.com/lecture')
     await user.click(screen.getByRole('button', { name: 'URL 업로드 요청' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('아직 구현되지 않았습니다')
