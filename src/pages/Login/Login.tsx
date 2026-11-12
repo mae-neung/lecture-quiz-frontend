@@ -16,7 +16,7 @@ function Login() {
   const [isPending, setPending] = useState(false)
   const state: unknown = location.state
   const from = typeof state === 'object' && state !== null && 'from' in state &&
-    typeof state.from === 'string' && /^\/(?:upload|account|subjects(?:\/[A-Za-z0-9_-]+(?:\/wiki\/[A-Za-z0-9_-]+)?)?|quiz(?:\/[A-Za-z0-9_-]+)?|library(?:\/[A-Za-z0-9_-]+)?)(?:[?#]|$)/.test(state.from)
+    typeof state.from === 'string' && /^\/(?:upload|account|subjects(?:\/[A-Za-z0-9_-]+(?:\/wiki\/[A-Za-z0-9_-]+|\/quiz)?)?|quiz)(?:[?#]|$)/.test(state.from)
     ? state.from
     : '/upload'
 

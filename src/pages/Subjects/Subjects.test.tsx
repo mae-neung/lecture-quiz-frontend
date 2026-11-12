@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthContext } from '@/features/auth/AuthContext'
 import Subjects from './Subjects'
@@ -8,8 +8,13 @@ import Subjects from './Subjects'
 const api = vi.hoisted(() => ({ getSubjects: vi.fn(), createSubject: vi.fn(), updateSubject: vi.fn(), deleteSubject: vi.fn() }))
 vi.mock('@/services/api', async (importOriginal) => ({ ...await importOriginal<typeof import('@/services/api')>(), ...api }))
 
+function LocationProbe() {
+  const location = useLocation()
+  return <div data-testid="location">{location.pathname}</div>
+}
+
 function renderSubjects() {
-  return render(<AuthContext.Provider value={{ isLoggedIn: true, userId: 'u1', login: vi.fn(), logout: vi.fn() }}><MemoryRouter><Subjects /></MemoryRouter></AuthContext.Provider>)
+  return render(<AuthContext.Provider value={{ isLoggedIn: true, userId: 'u1', login: vi.fn(), logout: vi.fn() }}><MemoryRouter><Routes><Route path="*" element={<><Subjects /><LocationProbe /></>} /></Routes></MemoryRouter></AuthContext.Provider>)
 }
 
 beforeEach(() => vi.clearAllMocks())
@@ -34,6 +39,15 @@ describe('Subjects', () => {
     expect(api.updateSubject).toHaveBeenCalledWith('u1', 's1', '통계학')
   })
 
+  it('문제풀기 버튼으로 과목 Quiz 경로로 이동한다', async () => {
+    api.getSubjects.mockResolvedValue([{ subjectId: 's1', subjectName: '통계학', subjectNumber: 1 }])
+    const user = userEvent.setup()
+    renderSubjects()
+    await screen.findByRole('heading', { name: '통계학' })
+    await user.click(screen.getByRole('button', { name: '문제풀기' }))
+    expect(screen.getByTestId('location')).toHaveTextContent('/subjects/s1/quiz')
+  })
+
   it('선택한 과목을 확인한 뒤에만 DELETE를 보낸다', async () => {
     api.getSubjects.mockResolvedValue([{ subjectId: 's1', subjectName: '통계학', subjectNumber: 1 }])
     api.deleteSubject.mockResolvedValue(undefined)
@@ -44,7 +58,6 @@ describe('Subjects', () => {
     expect(api.deleteSubject).not.toHaveBeenCalled()
     expect(screen.getByText(/통계학.*과목을 삭제할까요/)).toBeInTheDocument()
     expect(screen.getByText(/서버에 저장된.*요약, 문제와 풀이·채점 기록은 모두 영구 삭제/)).toBeInTheDocument()
-    expect(screen.getByText(/이 브라우저의 보관함 문제 세트는 별도로 남/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '과목 삭제 확인' }))
     await waitFor(() => expect(api.deleteSubject).toHaveBeenCalledWith('u1', 's1'))
     expect(screen.queryByRole('heading', { name: '통계학' })).not.toBeInTheDocument()

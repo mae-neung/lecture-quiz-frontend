@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '@/components/Button/Button'
-import { createSavedSet } from '@/features/library/libraryStorage'
 import { validateLecture } from '@/features/upload/validateLecture'
 import type { LectureErrors, LectureType } from '@/features/upload/validateLecture'
 import { useApiUpload } from '@/features/upload/useApiUpload'
@@ -11,11 +10,11 @@ import { isApiMode } from '@/services/api'
 import './Upload.css'
 
 type RegisteredLecture = {
-  id: string
   type: LectureType
   title: string
   fileName: string
   fileSize: number
+  quizTo: string
 }
 
 const options: { type: LectureType; label: string; description: string }[] = [
@@ -36,7 +35,6 @@ function Upload() {
   const [file, setFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<LectureErrors>({})
   const [registered, setRegistered] = useState<RegisteredLecture | null>(null)
-  const [saveError, setSaveError] = useState('')
   const titleInput = useRef<HTMLInputElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 
@@ -48,7 +46,6 @@ function Upload() {
     setFile(null)
     setErrors({})
     setRegistered(null)
-    setSaveError('')
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -67,20 +64,13 @@ function Upload() {
     }
     if (!file) return
 
-    const saved = isApiMode
-      ? await apiUpload.submit(title.trim(), type, file)
-      : createSavedSet({ materialType: type, title: title.trim(), fileName: file.name, fileSize: file.size })
+    const trimmedTitle = title.trim()
     if (isApiMode) {
-      if (saved && 'id' in saved) setRegistered({ id: saved.id, type, title: saved.title, fileName: file.name, fileSize: file.size })
+      const result = await apiUpload.submit(trimmedTitle, type, file)
+      if (result) setRegistered({ type, title: trimmedTitle, fileName: file.name, fileSize: file.size, quizTo: `/subjects/${result.subjectId}/quiz` })
       return
     }
-    if (!saved || !('ok' in saved)) return
-    if (!saved.ok) {
-      setSaveError(saved.error)
-      return
-    }
-    setSaveError('')
-    setRegistered({ id: saved.value.id, type, title: saved.value.title, fileName: file.name, fileSize: file.size })
+    setRegistered({ type, title: trimmedTitle, fileName: file.name, fileSize: file.size, quizTo: '/quiz' })
   }
 
   return (
@@ -102,10 +92,9 @@ function Upload() {
               <div><dt>파일명</dt><dd>{registered.fileName}</dd></div>
               <div><dt>파일 크기</dt><dd>{(registered.fileSize / 1024 / 1024).toFixed(2)} MB</dd></div>
             </dl>
-            <p className="upload-result__notice">{isApiMode ? '서버가 만든 5개 문제를 이 브라우저에 저장했어요. 원본 파일은 서버에 전송되며 브라우저 보관함에는 저장되지 않아요.' : '문제 세트를 이 브라우저에 저장했어요. 실제 파일 분석 결과 대신 준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요. 원본 파일은 저장되지 않았어요.'}</p>
+            <p className="upload-result__notice">{isApiMode ? '서버가 과목에 문제를 생성했어요. 원본 파일은 서버로 전송되며, 과목에서 바로 문제를 풀 수 있어요.' : '실제 파일 분석 결과 대신 준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요. 원본 파일은 저장되지 않았어요.'}</p>
             <div className="upload-result__actions">
-              <Link className="upload-result__quiz-link" to={`/quiz/${registered.id}`}>저장한 문제 풀기</Link>
-              <Link className="upload-result__quiz-link" to={`/library/${registered.id}`}>문제 세트 관리</Link>
+              <Link className="upload-result__quiz-link" to={registered.quizTo}>문제 풀기</Link>
               <Button onClick={resetForm} variant="secondary">다른 자료 등록하기</Button>
             </div>
           </div>
@@ -183,7 +172,6 @@ function Upload() {
             </div>
 
             {(errors.title || errors.file) && <p className="upload-form__alert" role="alert">입력 내용을 확인해 주세요.</p>}
-            {saveError && <p className="upload-form__alert" role="alert">{saveError}</p>}
             {isApiMode && <p aria-live="polite" role="status">{apiUpload.progress}</p>}
             {isApiMode && apiUpload.error && <p className="upload-form__alert" role="alert">{apiUpload.error}</p>}
             {isApiMode && apiUpload.hasCheckpoint && <p className="form-hint">처리 중인 자료의 제목·유형·파일은 변경할 수 없습니다.</p>}

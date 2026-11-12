@@ -13,7 +13,3 @@ export const API_STORAGE_NAMESPACE = resolveApiStorageNamespace(
 export function apiSessionKey(namespace = API_STORAGE_NAMESPACE): string {
   return `lecture-quiz-api-user-id.${encodeURIComponent(namespace)}`
 }
-
-export function apiLibraryScope(userId: string, namespace = API_STORAGE_NAMESPACE): string {
-  return `${encodeURIComponent(namespace)}:${encodeURIComponent(userId)}`
-}
