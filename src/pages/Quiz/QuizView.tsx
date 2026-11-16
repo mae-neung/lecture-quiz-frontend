@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import Button from '@/components/Button/Button'
 import { getCorrectCount, getFirstUnansweredIndex, getGradableCount, getQuizScore, isAnswered, isCorrect } from '@/features/quiz/scoreQuiz'
-import { isChoiceQuestion, isGradableQuestion, QUESTION_TYPE_LABEL, type QuizAnswers, type QuizQuestion } from '@/features/quiz/types'
+import { isChoiceQuestion, isGradableQuestion, QUESTION_TYPE_LABEL, type QuizAnswers, type QuizGrades, type QuizQuestion } from '@/features/quiz/types'
 
 function TypeBadge({ question }: { question: QuizQuestion }) {
   return (
@@ -14,21 +14,25 @@ function TypeBadge({ question }: { question: QuizQuestion }) {
 }
 
 // 문제 세트의 데이터 소스(목업·서버)와 무관하게 풀이·채점 UI를 담당한다.
-function QuizView({ questions, heading, sourceLabel, resultActions }: {
+// onServerGrade가 주어지면 '채점하기'가 서버 채점(답안 저장→채점→결과 조회)을 거치고,
+// 서버의 grade_state·explanation으로 결과를 표시한다. 없으면 기존 클라이언트 채점을 쓴다.
+function QuizView({ questions, heading, sourceLabel, resultActions, onServerGrade }: {
   questions: QuizQuestion[]
   heading: string
   sourceLabel: string
   resultActions?: ReactNode
+  onServerGrade?: (answers: QuizAnswers) => Promise<QuizGrades>
 }) {
   const [answers, setAnswers] = useState<QuizAnswers>({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
+  const [isGrading, setIsGrading] = useState(false)
+  const [serverGrades, setServerGrades] = useState<QuizGrades | null>(null)
   const [submitError, setSubmitError] = useState('')
   const questionHeading = useRef<HTMLHeadingElement>(null)
   const resultHeading = useRef<HTMLHeadingElement>(null)
   const question = questions[currentIndex]
   const answeredCount = questions.filter((item) => isAnswered(item, answers)).length
-  const gradableCount = getGradableCount(questions)
   const hasLongAnswer = questions.some((item) => !isGradableQuestion(item))
 
   useEffect(() => {
@@ -46,13 +50,26 @@ function QuizView({ questions, heading, sourceLabel, resultActions }: {
     setSubmitError('')
   }
 
-  function gradeQuiz() {
+  async function gradeQuiz() {
+    if (isGrading) return
     const firstUnanswered = getFirstUnansweredIndex(questions, answers)
     if (firstUnanswered >= 0) {
       setCurrentIndex(firstUnanswered)
       setSubmitError(`${firstUnanswered + 1}번 문제부터 답을 입력해 주세요.`)
       requestAnimationFrame(() => questionHeading.current?.focus())
       return
+    }
+    if (onServerGrade) {
+      setIsGrading(true)
+      setSubmitError('')
+      try {
+        setServerGrades(await onServerGrade(answers))
+      } catch (caught) {
+        setSubmitError(caught instanceof Error ? caught.message : '채점에 실패했습니다. 잠시 뒤 다시 시도해 주세요.')
+        return
+      } finally {
+        setIsGrading(false)
+      }
     }
     setIsComplete(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -62,23 +79,34 @@ function QuizView({ questions, heading, sourceLabel, resultActions }: {
     setAnswers({})
     setCurrentIndex(0)
     setSubmitError('')
+    setServerGrades(null)
     setIsComplete(false)
     requestAnimationFrame(() => questionHeading.current?.focus())
   }
 
   if (isComplete) {
-    const correctCount = getCorrectCount(questions, answers)
-    const score = getQuizScore(questions, answers)
+    const serverMode = serverGrades !== null
+    // 서버 채점은 서술형 포함 채점 완료(correct/incorrect)된 문항만 분모로 쓴다.
+    const serverGraded = serverMode ? questions.filter((item) => serverGrades[item.id] && serverGrades[item.id].state !== 'not_graded') : []
+    const correctCount = serverMode
+      ? serverGraded.filter((item) => serverGrades[item.id].state === 'correct').length
+      : getCorrectCount(questions, answers)
+    const gradableCount = serverMode ? serverGraded.length : getGradableCount(questions)
+    const score = serverMode
+      ? (gradableCount === 0 ? 0 : Math.round((correctCount / gradableCount) * 100))
+      : getQuizScore(questions, answers)
+    // 서버 채점은 서술형도 채점하므로 '자동 채점 제외' 안내를 쓰지 않는다.
+    const showGradableNote = !serverMode && hasLongAnswer
 
     return (
       <Box as="section" maxW="1000px" mx="auto" px={["16px", "24px"]} py={["40px", "64px"]}>
         <Text as="p" color="$accent" fontSize="13px" fontWeight={900} letterSpacing="0.08em" m={0}>채점 완료 · {sourceLabel}</Text>
         <Text as="h1" color="$text" fontSize={["36px", "52px"]} letterSpacing="-0.055em" lineHeight={1.15} mb="12px" mt="12px" ref={resultHeading} tabIndex={-1}>오늘의 복습 결과예요.</Text>
-        <Text as="p" color="$muted" lineHeight={1.7} m={0}>페이지를 새로고침하면 풀이 기록이 초기화돼요.{hasLongAnswer ? ' 서술형은 자동 채점 대상이 아니라 모범답안으로 스스로 점검해요.' : ''}</Text>
+        <Text as="p" color="$muted" lineHeight={1.7} m={0}>{serverMode ? '서버가 채점한 결과예요. 페이지를 새로고침하면 풀이 화면이 초기화되지만 채점 기록은 서버에 남아요.' : '페이지를 새로고침하면 풀이 기록이 초기화돼요.'}{showGradableNote ? ' 서술형은 자동 채점 대상이 아니라 모범답안으로 스스로 점검해요.' : ''}</Text>
 
         <Grid aria-live="polite" bg="$accent" borderRadius="22px" color="$onAccent" gap="12px" gridTemplateColumns={["1fr", "1.4fr 1fr"]} mt="36px" p={["24px", "36px"]}>
           <Box>
-            <Text as="p" fontSize="14px" fontWeight={800} m={0} opacity={0.82}>100점 환산{hasLongAnswer ? ' · 자동 채점 문항 기준' : ''}</Text>
+            <Text as="p" fontSize="14px" fontWeight={800} m={0} opacity={0.82}>100점 환산{showGradableNote ? ' · 자동 채점 문항 기준' : ''}</Text>
             <Text as="p" fontSize={["54px", "72px"]} fontWeight={900} letterSpacing="-0.06em" lineHeight={1} mb={0} mt="8px">{score}점</Text>
           </Box>
           <Flex alignItems={["flex-start", "center"]} borderLeft={["0", "1px solid"]} borderTop={["1px solid", "0"]} borderColor="$focusRing" flexDirection="column" justifyContent="center" pl={[0, "30px"]} pt={["18px", 0]}>
@@ -96,8 +124,9 @@ function QuizView({ questions, heading, sourceLabel, resultActions }: {
           <Text as="h2" color="$text" fontSize="28px" letterSpacing="-0.04em" mb="20px" mt={0}>문항별 해설</Text>
           <Grid gap="14px">
             {questions.map((item, index) => {
-              const gradable = isGradableQuestion(item)
-              const correct = gradable && isCorrect(item, answers)
+              const serverGrade = serverMode ? (serverGrades[item.id] ?? null) : null
+              const gradable = serverMode ? (serverGrade !== null && serverGrade.state !== 'not_graded') : isGradableQuestion(item)
+              const correct = serverMode ? serverGrade?.state === 'correct' : (isGradableQuestion(item) && isCorrect(item, answers))
               const answerValue = answers[item.id] ?? ''
               const myAnswerLabel = isChoiceQuestion(item)
                 ? (item.options.find((option) => option.id === answerValue)?.label ?? '(미응답)')
@@ -105,9 +134,10 @@ function QuizView({ questions, heading, sourceLabel, resultActions }: {
               const correctLabel = isChoiceQuestion(item)
                 ? (item.options.find((option) => option.id === item.correctOptionId)?.label ?? item.correctAnswer)
                 : item.correctAnswer
+              const explanationText = serverMode ? ((serverGrade?.explanation ?? '').trim() || item.explanation) : item.explanation
               const borderColor = !gradable ? '$border' : correct ? '$accent' : '$danger'
               const statusColor = !gradable ? '$muted' : correct ? '$accent' : '$danger'
-              const statusLabel = !gradable ? '채점 제외' : correct ? '정답' : '오답'
+              const statusLabel = !gradable ? (serverMode ? '채점 안 됨' : '채점 제외') : correct ? '정답' : '오답'
               return (
                 <Box bg="$surface" borderColor={borderColor} borderRadius="18px" borderStyle="solid" borderWidth="1px" key={item.id} p={["20px", "26px"]}>
                   <Flex alignItems="center" gap="10px" justifyContent="space-between">
@@ -120,7 +150,7 @@ function QuizView({ questions, heading, sourceLabel, resultActions }: {
                   <Grid gap="7px" mt="16px">
                     <Text as="p" color="$muted" lineHeight={1.6} m={0}><strong>내 답:</strong> {myAnswerLabel}</Text>
                     <Text as="p" color="$text" lineHeight={1.6} m={0}><strong>{item.type === 'long' ? '모범답안:' : '정답:'}</strong> {correctLabel}</Text>
-                    <Text as="p" bg="$surfaceMuted" borderRadius="10px" color="$muted" lineHeight={1.7} mb={0} mt="5px" p="13px"><strong>해설:</strong> {item.explanation}</Text>
+                    <Text as="p" bg="$surfaceMuted" borderRadius="10px" color="$muted" lineHeight={1.7} mb={0} mt="5px" p="13px"><strong>해설:</strong> {explanationText}</Text>
                   </Grid>
                 </Box>
               )
@@ -228,16 +258,17 @@ function QuizView({ questions, heading, sourceLabel, resultActions }: {
                 style={{ border: '1px solid var(--color-border)', borderRadius: 13, color: 'var(--color-text)', background: 'var(--color-surface)', fontFamily: 'inherit', fontSize: 16, lineHeight: 1.6, padding: '14px 16px', resize: 'vertical', width: '100%' }}
                 value={answerValue}
               />
-              <Text as="p" color="$muted" fontSize="13px" lineHeight={1.6} mb={0} mt="10px">서술형은 자동 채점 대상이 아니에요. 채점 후 모범답안과 비교해 스스로 점검해요.</Text>
+              <Text as="p" color="$muted" fontSize="13px" lineHeight={1.6} mb={0} mt="10px">{onServerGrade ? '서버가 서술형까지 채점하고 해설을 제공해요.' : '서술형은 자동 채점 대상이 아니에요. 채점 후 모범답안과 비교해 스스로 점검해요.'}</Text>
             </Box>
           )}
 
           {submitError && <Text as="p" color="$danger" fontWeight={800} id="quiz-submit-error" mb={0} mt="18px" role="alert">{submitError}</Text>}
+          {isGrading && <Text as="p" color="$muted" fontWeight={800} mb={0} mt="18px" role="status">서버가 채점하고 있어요. 잠시만 기다려 주세요.</Text>}
           <Flex flexWrap="wrap" gap="10px" justifyContent="space-between" mt="28px">
-            <Button disabled={currentIndex === 0} onClick={() => moveTo(currentIndex - 1)} variant="secondary">이전 문제</Button>
+            <Button disabled={currentIndex === 0 || isGrading} onClick={() => moveTo(currentIndex - 1)} variant="secondary">이전 문제</Button>
             <Flex flexWrap="wrap" gap="10px">
-              {currentIndex < questions.length - 1 && <Button onClick={() => moveTo(currentIndex + 1)}>다음 문제</Button>}
-              <Button aria-describedby={submitError ? 'quiz-submit-error' : undefined} onClick={gradeQuiz} variant={currentIndex === questions.length - 1 ? 'primary' : 'secondary'}>채점하기</Button>
+              {currentIndex < questions.length - 1 && <Button disabled={isGrading} onClick={() => moveTo(currentIndex + 1)}>다음 문제</Button>}
+              <Button aria-busy={isGrading} aria-describedby={submitError ? 'quiz-submit-error' : undefined} disabled={isGrading} onClick={() => { void gradeQuiz() }} variant={currentIndex === questions.length - 1 ? 'primary' : 'secondary'}>{isGrading ? '채점 중…' : '채점하기'}</Button>
             </Flex>
           </Flex>
         </Box>

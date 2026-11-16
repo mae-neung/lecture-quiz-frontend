@@ -221,7 +221,33 @@ curl -X POST "http://127.0.0.1:8000/lecture-materials/upload" \
 }
 ```
 
-채점(`Grade`) 데이터는 문제 생성 시 내부적으로 함께 만들어지지만 현재 공개 API가 없다.
+채점(`Grade`) 데이터는 문제 생성 시 `grade_state: "not_graded"`로 함께 만들어지고, 아래 채점 API로 갱신·조회한다.
+
+### 3.5 채점 API
+
+| 기능 | 메서드 | 요청 경로 | JSON 본문 | 성공 시 `data` | 주의사항 |
+| --- | --- | --- | --- | --- | --- |
+| 문제 채점 | `POST` | `/grades/grade` | `{"user_id":"<uid>","subject_id":"<id>","wiki_document_id":"<id>"}` | `null` | 위키 문서의 **모든 문제**를 서버(AI)가 채점한다. 저장된 사용자 답변을 읽어 채점하므로 답변 저장이 선행돼야 한다. 이미 `correct`인 문제는 건너뛴다. 채점이 끝날 때까지 응답을 보류한다(동기). 이미 진행 중이면 `채점이 이미 진행중입니다` 400을 반환한다. |
+| 채점 진행 상태 | `POST` | `/grades/is-grading` | `{"user_id":"<uid>","subject_id":"<id>","wiki_document_id":"<id>"}` | `{"is_grading":true}` | 프로세스 메모리 기준 플래그라 서버 재시작 시 초기화되고 워커 간 공유되지 않는다. |
+| 전체 채점 결과 조회 | `POST` | `/grades/get-all` | `{"user_id":"<uid>","subject_id":"<id>","wiki_document_id":"<id>"}` | `{"grades":[Grade, ...]}` | 위키 문서 기준 필터다. 정렬하지 않는다. |
+
+`Grade` 반환 구조:
+
+```json
+{
+  "owner_user_id": "<uid>",
+  "owner_subject_id": "<subject-id>",
+  "owner_wiki_document_id": "<wiki-id>",
+  "owner_problem_id": "<problem-id>",
+  "grade_id": "<uuid>",
+  "grade_state": "correct",
+  "explanation": "채점 해설"
+}
+```
+
+- `grade_state`: `not_graded`(채점 전), `correct`(정답), `incorrect`(오답) 중 하나
+- `explanation`: 채점 해설 문자열(미채점 시 빈 문자열)
+- 점수·정오 외 별도 점수(score) 필드는 없다. 정오는 `grade_state`로만 판단한다.
 
 ## 4. 프론트엔드 권장 호출 순서
 
@@ -233,7 +259,8 @@ curl -X POST "http://127.0.0.1:8000/lecture-materials/upload" \
   → 위키 문서 조회(wiki_document_id 획득)
   → 문제 생성
   → 문제/답변 조회
-  → 답변 수정
+  → 답변 수정(사용자 답안 저장)
+  → 문제 채점(/grades/grade) → 채점 결과 조회(/grades/get-all)
 ```
 
 현재 구현에서 로그인 응답은 `user_id`만 반환한다. 보안 수정 후에는 로그인 클라이언트가 Firebase ID 토큰을 보유하고 모든 보호 API에 `Authorization: Bearer <id_token>`을 보내며, 서버가 검증된 토큰의 UID를 사용해야 한다. 요청 본문의 `user_id`를 권한 판단에 사용하면 안 된다.

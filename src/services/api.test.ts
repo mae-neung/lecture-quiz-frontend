@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { apiRequest, createProblems, deleteProblem, deleteSubject, deleteUnverifiedUsers, deleteUser, getProblems, getSubjects, getUserAnswers, getWikiDocuments, isCreatingProblems, isSummarized, isUploading, loginApi, resendEmailVerificationApi, signupApi, updateUserAnswer, uploadLecture, uploadLectureUrls } from './api'
+import { apiRequest, createProblems, deleteProblem, deleteSubject, deleteUnverifiedUsers, deleteUser, getGrades, getProblems, getSubjects, getUserAnswers, getWikiDocuments, gradeProblems, isCreatingProblems, isGrading, isSummarized, isUploading, loginApi, resendEmailVerificationApi, signupApi, updateUserAnswer, uploadLecture, uploadLectureUrls } from './api'
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -114,6 +114,31 @@ describe('Amadda API', () => {
     await expect(getWikiDocuments('u1', 's1')).resolves.toEqual([])
     await expect(getProblems('u1', 's1', 'w1')).resolves.toEqual([])
     await expect(getUserAnswers('u1', 's1', 'w1')).resolves.toEqual([])
+  })
+
+  it('채점 API는 계약 본문을 전송하고 Grade 목록·상태를 검증한다', async () => {
+    const grade = { owner_user_id: 'u1', owner_subject_id: 's1', owner_wiki_document_id: 'w1', owner_problem_id: 'p1', grade_id: 'g1', grade_state: 'correct', explanation: '정답 해설' }
+    const envelope = (data: unknown) => ({ ok: true, json: async () => ({ success: true, message: 'ok', data }) })
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(envelope(null))
+      .mockResolvedValueOnce(envelope({ is_grading: true }))
+      .mockResolvedValueOnce(envelope({ grades: [grade] }))
+      .mockResolvedValueOnce(envelope({ grades: [{ ...grade, grade_state: 'unknown' }] }))
+    vi.stubGlobal('fetch', fetchMock)
+    await gradeProblems('u1', 's1', 'w1')
+    expect(fetchMock.mock.calls[0][0]).toContain('/grades/grade')
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ user_id: 'u1', subject_id: 's1', wiki_document_id: 'w1' })
+    expect(await isGrading('u1', 's1', 'w1')).toBe(true)
+    expect(fetchMock.mock.calls[1][0]).toContain('/grades/is-grading')
+    expect(await getGrades('u1', 's1', 'w1')).toEqual([grade])
+    expect(fetchMock.mock.calls[2][0]).toContain('/grades/get-all')
+    await expect(getGrades('u1', 's1', 'w1')).rejects.toThrow('채점 응답 형식')
+  })
+
+  it('채점 결과도 빈 컬렉션 400을 빈 목록으로 정규화한다', async () => {
+    const missing = { ok: false, status: 400, json: async () => ({ success: false, message: 'owner user id or owner subject id or owner wiki document id not found', data: null }) }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(missing))
+    await expect(getGrades('u1', 's1', 'w1')).resolves.toEqual([])
   })
 
   it('설정한 생성 규칙과 답안 수정·문제 삭제·계정 관리 계약을 전송한다', async () => {

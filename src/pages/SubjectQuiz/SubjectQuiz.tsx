@@ -43,6 +43,7 @@ function SubjectQuizContent({ subjectId }: { subjectId?: string }) {
       questions={model.questions}
       heading={`${model.subjectName || '과목'} 문제 풀기`}
       sourceLabel="서버 생성"
+      onServerGrade={model.submitAndGrade}
       resultActions={<>
         {subjectId && <Button onClick={() => navigate(`/subjects/${subjectId}`)} variant="secondary">과목 상세로</Button>}
         <Button onClick={() => navigate('/subjects')} variant="secondary">내 과목으로</Button>
