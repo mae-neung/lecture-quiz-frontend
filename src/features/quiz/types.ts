@@ -17,6 +17,11 @@ export type QuizQuestion = {
 
 export type QuizAnswers = Record<string, string>
 
+// 서버 채점 결과를 문항 id 기준으로 담는다. state는 서버 grade_state와 1:1 대응한다.
+export type QuizGradeState = 'not_graded' | 'correct' | 'incorrect'
+export type QuizGrade = { state: QuizGradeState; explanation: string }
+export type QuizGrades = Record<string, QuizGrade>
+
 // 선택형(객관식·OX)은 보기를 고르는 방식으로 자동 채점한다.
 export const CHOICE_TYPES: readonly QuizQuestionType[] = ['ox', 'select']
 

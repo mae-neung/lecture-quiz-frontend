@@ -328,3 +328,49 @@ export async function updateUserAnswer(userId: string, subjectId: string, answer
 export async function deleteProblem(userId: string, subjectId: string, problemId: string): Promise<void> {
   expectNull(await deleteRequest('/problems/delete', { user_id: userId, subject_id: subjectId, problem_id: problemId }), '문제 삭제')
 }
+
+// 서버 채점 상태값. 서버는 생성 시 not_graded로 두고 채점 후 correct/incorrect로 갱신한다.
+export type GradeState = 'not_graded' | 'correct' | 'incorrect'
+const GRADE_STATES: readonly GradeState[] = ['not_graded', 'correct', 'incorrect']
+
+export type ApiGrade = {
+  owner_user_id: string
+  owner_subject_id: string
+  owner_wiki_document_id: string
+  owner_problem_id: string
+  grade_id: string
+  grade_state: GradeState
+  explanation: string
+}
+
+function parseGrade(value: unknown): ApiGrade {
+  const item = expectRecord(value, '채점')
+  if (typeof item.grade_state !== 'string' || !GRADE_STATES.includes(item.grade_state as GradeState) ||
+    typeof item.explanation !== 'string') throw new ApiError('채점 응답 형식이 올바르지 않습니다.')
+  return {
+    owner_user_id: expectId(item.owner_user_id, '채점 사용자'), owner_subject_id: expectId(item.owner_subject_id, '채점 과목'),
+    owner_wiki_document_id: expectId(item.owner_wiki_document_id, '채점 문서'), owner_problem_id: expectId(item.owner_problem_id, '채점 문제'),
+    grade_id: expectId(item.grade_id, '채점'), grade_state: item.grade_state as GradeState, explanation: item.explanation,
+  }
+}
+
+// 위키 문서의 모든 문제를 서버에서 채점한다. 저장된 사용자 답안을 읽어 채점하므로 답안 저장이 선행돼야 한다.
+// 엔드포인트는 채점이 끝날 때까지 응답을 보류한다(동기).
+export async function gradeProblems(userId: string, subjectId: string, wikiId: string): Promise<void> {
+  expectNull(await apiRequest('/grades/grade', { user_id: userId, subject_id: subjectId, wiki_document_id: wikiId }), '채점')
+}
+
+export async function isGrading(userId: string, subjectId: string, wikiId: string): Promise<boolean> {
+  return expectBooleanData(await apiRequest('/grades/is-grading', { user_id: userId, subject_id: subjectId, wiki_document_id: wikiId }), 'is_grading', '채점 상태')
+}
+
+export async function getGrades(userId: string, subjectId: string, wikiId: string): Promise<ApiGrade[]> {
+  let raw: unknown
+  try { raw = await apiRequest('/grades/get-all', { user_id: userId, subject_id: subjectId, wiki_document_id: wikiId }) }
+  catch (error) { if (isEmptyCollectionError(error)) return []; throw error }
+  const data = expectRecord(raw, '채점 결과 조회')
+  if (!Array.isArray(data.grades)) throw new ApiError('채점 결과 목록 응답 형식이 올바르지 않습니다.')
+  const grades = data.grades.map(parseGrade)
+  if (new Set(grades.map((item) => item.grade_id)).size !== grades.length) throw new ApiError('채점 식별자가 중복되었습니다.')
+  return grades
+}
