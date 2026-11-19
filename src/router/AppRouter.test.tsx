@@ -4,8 +4,13 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import AppRouter from './AppRouter'
 
 function openAt(path: string) {
-  window.history.replaceState({}, '', `/lecture-quiz-frontend/#${path}`)
+  window.history.replaceState({}, '', path)
   render(<AppRouter />)
+}
+
+// BrowserRouter에서는 경로가 해시가 아닌 pathname+search에 담긴다.
+function currentRoute() {
+  return `${window.location.pathname}${window.location.search}`
 }
 
 async function signIn() {
@@ -35,7 +40,7 @@ describe('AppRouter', () => {
 
   it('미로그인 /upload 접근을 막고 로그인 후 원래 경로로 돌아온다', async () => {
     openAt('/upload?source=home')
-    expect(window.location.hash).toBe('#/login')
+    expect(currentRoute()).toBe('/login')
     expect(screen.getByText(/아맞다시험 데모/)).toBeInTheDocument()
 
     const user = userEvent.setup()
@@ -45,7 +50,7 @@ describe('AppRouter', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('아이디 또는 비밀번호를 확인해 주세요.')
     expect(screen.getByLabelText('아이디')).toHaveAttribute('aria-describedby', expect.stringContaining('login-error'))
     expect(screen.getByLabelText('비밀번호')).toHaveAttribute('aria-describedby', expect.stringContaining('login-error'))
-    expect(window.location.hash).toBe('#/login')
+    expect(currentRoute()).toBe('/login')
 
     await user.clear(screen.getByLabelText('아이디'))
     await user.clear(screen.getByLabelText('비밀번호'))
@@ -53,7 +58,7 @@ describe('AppRouter', () => {
     await user.type(screen.getByLabelText('비밀번호'), 'test1234')
     await user.click(screen.getByRole('button', { name: '로그인하고 시작하기' }))
 
-    expect(window.location.hash).toBe('#/upload?source=home')
+    expect(currentRoute()).toBe('/upload?source=home')
     expect(screen.getByRole('heading', { name: '이번 시험에 나올 강의 자료를 골라주세요.' })).toBeInTheDocument()
     expect(Object.values(window.sessionStorage)).not.toContain('test1234')
   })
@@ -61,14 +66,14 @@ describe('AppRouter', () => {
   it('로그아웃하면 세션을 지우고 업로드 경로를 다시 보호한다', async () => {
     openAt('/login')
     const user = await signIn()
-    expect(window.location.hash).toBe('#/upload')
+    expect(currentRoute()).toBe('/upload')
 
     await user.click(screen.getByRole('button', { name: '로그아웃' }))
-    expect(window.location.hash).toBe('#/login')
+    expect(currentRoute()).toBe('/login')
     expect(window.sessionStorage.length).toBe(0)
 
     await user.click(screen.getByRole('link', { name: '자료 등록' }))
-    expect(window.location.hash).toBe('#/login')
+    expect(currentRoute()).toBe('/login')
   })
 
   it('빈 강의명·파일 및 잘못된 파일 형식을 안내한다', async () => {
@@ -97,7 +102,7 @@ describe('AppRouter', () => {
     expect(screen.getByRole('status')).toHaveTextContent('데이터 분석 1강')
     expect(screen.getByRole('status')).toHaveTextContent('lecture.pdf')
     expect(screen.getByRole('status')).toHaveTextContent('준비된 5개의 목업 문제로 풀이 흐름을 체험할 수 있어요.')
-    expect(screen.getByRole('link', { name: '문제 풀기' })).toHaveAttribute('href', '#/quiz')
+    expect(screen.getByRole('link', { name: '문제 풀기' })).toHaveAttribute('href', '/quiz')
 
     await user.click(screen.getByRole('button', { name: '다른 자료 등록하기' }))
     expect(screen.getByLabelText('강의명')).toHaveValue('')
@@ -107,12 +112,12 @@ describe('AppRouter', () => {
   it('알 수 없는 경로에서 404 화면과 복귀 링크를 제공한다', () => {
     openAt('/missing-page')
     expect(screen.getByRole('heading', { name: '페이지를 찾을 수 없습니다.' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '홈으로 돌아가기' })).toHaveAttribute('href', '#/')
+    expect(screen.getByRole('link', { name: '홈으로 돌아가기' })).toHaveAttribute('href', '/')
   })
 
   it('데모 모드의 회원가입 경로는 로그인으로 안전하게 이동한다', () => {
     openAt('/signup')
-    expect(window.location.hash).toBe('#/login')
+    expect(currentRoute()).toBe('/login')
     expect(screen.queryByRole('link', { name: '계정 만들기' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '내 과목' })).not.toBeInTheDocument()
   })
@@ -120,7 +125,7 @@ describe('AppRouter', () => {
   it.each(['/subjects/demo', '/subjects/demo/wiki/wiki', '/account'])('데모 모드의 API 전용 경로 %s 는 자료 등록으로 이동한다', (path) => {
     window.sessionStorage.setItem('lecture-quiz-demo-session', 'active')
     openAt(path)
-    expect(window.location.hash).toBe('#/upload')
+    expect(currentRoute()).toBe('/upload')
     expect(screen.queryByRole('link', { name: '계정 관리' })).not.toBeInTheDocument()
   })
 })

@@ -5,7 +5,7 @@ import { mockQuizQuestions } from '@/features/quiz/mockQuestions'
 import AppRouter from '@/router/AppRouter'
 
 function openAt(path: string) {
-  window.history.replaceState({}, '', `/lecture-quiz-frontend/#${path}`)
+  window.history.replaceState({}, '', path)
   render(<AppRouter />)
 }
 
@@ -25,11 +25,11 @@ beforeEach(() => {
 describe('Quiz', () => {
   it('미로그인 접근을 보호하고 로그인 뒤 문제풀이 화면으로 복귀한다', async () => {
     openAt('/quiz')
-    expect(window.location.hash).toBe('#/login')
+    expect(window.location.pathname).toBe('/login')
 
     await signIn()
 
-    expect(window.location.hash).toBe('#/quiz')
+    expect(window.location.pathname).toBe('/quiz')
     expect(screen.getByRole('heading', { name: '핵심 개념을 문제로 확인해요.' })).toBeInTheDocument()
   })
 
