@@ -1,4 +1,4 @@
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import AuthProvider from '@/features/auth/AuthProvider'
 import RequireDemoLogin from '@/features/auth/RequireDemoLogin'
 import AppLayout from '@/layouts/AppLayout/AppLayout'
@@ -17,10 +17,15 @@ import WikiDetail from '@/pages/WikiDetail/WikiDetail'
 import Account from '@/pages/Account/Account'
 import { isApiMode } from '@/services/api'
 
+// Vite base(배포 시 '/<repo>/', 개발·테스트 시 '/')에서 basename을 끌어온다.
+// 루트가 아니면 끝 슬래시를 떼어 react-router basename 규칙에 맞춘다.
+const rawBase = import.meta.env.BASE_URL
+const basename = rawBase === '/' ? rawBase : rawBase.replace(/\/$/, '')
+
 function AppRouter() {
   return (
     <AuthProvider>
-      <HashRouter>
+      <BrowserRouter basename={basename}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<Home />} />
@@ -40,7 +45,7 @@ function AppRouter() {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
-      </HashRouter>
+      </BrowserRouter>
     </AuthProvider>
   )
 }
